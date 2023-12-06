@@ -1,28 +1,30 @@
 // The package describes the entire business logic of the service
 package gofermart
 
+import "github.com/Schalure/gofermart/internal/configs"
+
 //	Main service object struct
 type Gofermart struct {
-	storage *Storage
-	logger *Logger
+	storager Storager
+	loggerer Loggerer
 }
 
 //	Service logging interface
-type Logger interface {
+type Loggerer interface {
 
 }
 
 //	Interface of work with the repository
-type Storage interface {
+type Storager interface {
 
 }
 
 //	Constructor of gofermart service object
-func NewGofermart(s *Storage, l *Logger) (*Gofermart, error) {
+func NewGofermart(config *configs.Config, s Storager, l Loggerer) *Gofermart {
 
 	return &Gofermart{
-		storage: s,
-		logger: l,
-	}, nil
+		storager: s,
+		loggerer: l,
+	}
 }
 

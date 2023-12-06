@@ -1,15 +1,17 @@
-package sloglogger
+package loggers
 
 import (
 	"log/slog"
 	"os"
+
+	"github.com/Schalure/gofermart/internal/configs"
 )
 
 type Logger struct {
 	logger *slog.Logger
 }
 
-func (l *Logger) NewLogger() *Logger {
+func NewLogger(config *configs.Config) *Logger {
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
