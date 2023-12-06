@@ -15,7 +15,10 @@ func main() {
 	log.Println("Starting application initialization...")
 
 	log.Println("Config initializing...")
-	config := configs.NewConfig()
+	config, err := configs.NewConfig()
+	if err != nil {
+		log.Println("Config have been initialized with error:", err)
+	}
 
 	log.Println("Logger initializing...")
 	logger := loggers.NewLogger(config)
@@ -30,6 +33,6 @@ func main() {
 	server := server.NewServer(config, service)
 
 	log.Println("Gofermart service have been started...")
-	err := server.Run()
+	err = server.Run()
 	server.Stop(err)
 }
