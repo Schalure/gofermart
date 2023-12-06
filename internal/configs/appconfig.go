@@ -42,7 +42,7 @@ func newAppConfig(fileName string) (*AppConfig, error) {
 //	Create application config file with default values
 func (c *AppConfig) createAppConfigFile(fileName string) error {
 
-	file, err :=  os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	file, err :=  os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("can't create application config file: \"%s\"", fileName)
 	}
