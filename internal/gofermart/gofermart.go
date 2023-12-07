@@ -26,6 +26,7 @@ type Gofermart struct {
 type Loggerer interface {
 	Info(args ...interface{})
 	Infow(msg string, keysAndValues ...interface{})
+	Debugw(msg string, keysAndValues ...interface{})
 }
 
 //	Interface of work with the repository
