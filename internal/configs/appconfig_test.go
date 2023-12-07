@@ -3,6 +3,7 @@ package configs
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,9 +22,11 @@ func Test_createAppConfigFile(t *testing.T) {
 			name: "simple test",
 			appConfig: AppConfig{
 				Env: Debug,
+				PassRules: defaultPassRules,
+				TokenTTL: defaultTokenTTL,
 			},
 			want: struct{data string}{
-				data: "Environment: debug\n",
+				data: "Environment: debug\nPasswordRules: '[0-9a-zA-Z]'\nTokenTimeToLife: 1h0m0s\n",
 			},
 		},
 	}
@@ -57,10 +60,12 @@ func Test_getAppConfigFromFile(t *testing.T) {
 	}{
 		{
 			name: "simple test",
-			data: "Environment: prod\n",
+			data: "Environment: prod\nPasswordRules: '[0-9a-zA-Z]'\nTokenTimeToLife: 2h30m10s\n",
 			want: struct{appConfig AppConfig}{
 				appConfig: AppConfig{
 					Env: Prod,
+					PassRules: defaultPassRules,
+					TokenTTL: time.Hour * 2 + time.Minute * 30 + time.Second * 10,
 				},
 			},
 		},
@@ -77,9 +82,7 @@ func Test_getAppConfigFromFile(t *testing.T) {
 			require.NoError(t, err, "stop test with error: ", err)
 			file.Close()
 
-			appConfig := AppConfig {
-				Env: Debug,
-			}
+			var appConfig AppConfig
 
 			err = appConfig.getAppConfigFromFile(file.Name())
 			require.NoError(t, err, "stop test with error: ", err)

@@ -4,6 +4,7 @@ package gofermart
 import (
 	"context"
 	"regexp"
+	"time"
 
 	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/storage"
@@ -11,6 +12,7 @@ import (
 
 const (
 	PasswordMinLenght = 8
+	defaultSecretKey = `poKdq834nFElq71`
 )
 
 
@@ -20,6 +22,8 @@ type Gofermart struct {
 	loggerer Loggerer
 
 	validPassword *regexp.Regexp
+	tokenTTL time.Duration
+	secretKey string
 }
 
 //	Service logging interface
@@ -45,6 +49,8 @@ func NewGofermart(config *configs.Config, s Storager, l Loggerer) *Gofermart {
 		loggerer: l,
 
 		validPassword: validPassword,
+		tokenTTL: config.AppConfig.TokenTTL,
+		secretKey: defaultSecretKey,
 	}
 }
 

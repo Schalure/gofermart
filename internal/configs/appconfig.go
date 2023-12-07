@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
@@ -12,6 +13,7 @@ import (
 type AppConfig struct {
 	Env Environment `yaml:"Environment"`
 	PassRules string `yaml:"PasswordRules"`
+	TokenTTL time.Duration `yaml:"TokenTimeToLife"`
 }
 
 //	Values for `yaml:"Environment"`
@@ -22,12 +24,20 @@ const (
 	Prod Environment = "prod"
 )
 
+//	Default application configugation values
+const (
+	defaultEnv = Debug
+	defaultPassRules = `[0-9a-zA-Z]`
+	defaultTokenTTL = time.Hour * 1
+)
+
 //	Application configuration constructor
 func newAppConfig(fileName string) (*AppConfig, error) {
 
 	appConfig := AppConfig {
-		Env: Debug,
-		PassRules: `[0-9a-zA-Z]`,
+		Env: defaultEnv,
+		PassRules: defaultPassRules,
+		TokenTTL: defaultTokenTTL,
 	}
 
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {
