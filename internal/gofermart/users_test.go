@@ -39,7 +39,7 @@ func Test_CreateUser(t *testing.T) {
 			password: "q1w2e3r4",
 			want: struct{err error; passwordHash string}{
 				err:  fmt.Errorf("a user with this login already exists"),
-				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
+				passwordHash: "",
 			},
 		},		
 		{
@@ -47,8 +47,8 @@ func Test_CreateUser(t *testing.T) {
 			login: "Nikita",
 			password: "q1",
 			want: struct{err error; passwordHash string}{
-				err:  fmt.Errorf("a user with this login already exists"),
-				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
+				err:  fmt.Errorf("password is too short"),
+				passwordHash: "",
 			},
 		},
 		{
@@ -56,8 +56,8 @@ func Test_CreateUser(t *testing.T) {
 			login: "Vova",
 			password: "q1w2e3r4%",
 			want: struct{err error; passwordHash string}{
-				err:  fmt.Errorf("a user with this login already exists"),
-				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
+				err:  fmt.Errorf("the password can only be made of characters: 0-9, a-z, A-Z"),
+				passwordHash: "",
 			},
 		},
 	}
@@ -85,5 +85,4 @@ func Test_CreateUser(t *testing.T) {
 			cancel()
 		})
 	}
-
 }

@@ -42,3 +42,7 @@ func (l *Logger) Info(args ...interface{}) {
 func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
 	l.logger.Info("msg", keysAndValues...)
 }
+
+func (l *Logger) Debugw(msg string, keysAndValues ...interface{}) {
+	l.logger.Debug("msg", keysAndValues...)
+}

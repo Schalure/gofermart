@@ -16,6 +16,10 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) erro
 	var errs []error
 
 	if _, err := g.storager.GetUserByLogin(ctx, login); err == nil {
+		g.loggerer.Debugw(
+			"func (g *Gofermart) CreateUser(ctx context.Context, login, password string) error",
+			"error", err,
+		)
 		return fmt.Errorf("a user with this login already exists")
 	}
 
@@ -43,17 +47,14 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) erro
 //	Check to valid password
 func (g *Gofermart) isPasswordValid(password string) error {
 
-	var errs []error
-
 	if len(password) < PasswordMinLenght {
-		errs = append(errs, fmt.Errorf("Password is too short"))
+		return fmt.Errorf("password is too short")
 	}
 
 	if !g.validPassword.MatchString(password) {
-		errs = append(errs, fmt.Errorf("The password can only be made of characters: 0-9, a-z, A-Z"))
+		return fmt.Errorf("the password can only be made of characters: 0-9, a-z, A-Z")
 	}
-
-	return errors.Join(errs...)
+	return nil
 }
 
 //	Generate password hash
