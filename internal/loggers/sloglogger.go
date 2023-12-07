@@ -34,3 +34,11 @@ func NewLogger(config *configs.Config) *Logger {
 		logger: logger,
 	}
 }
+
+func (l *Logger) Info(args ...interface{}) {
+	l.logger.Info("", args...)
+}
+
+func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
+	l.logger.Info("msg", keysAndValues...)
+}

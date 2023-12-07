@@ -1,6 +1,11 @@
 package postgrestor
 
-import "github.com/Schalure/gofermart/internal/configs"
+import (
+	"context"
+
+	"github.com/Schalure/gofermart/internal/configs"
+	"github.com/Schalure/gofermart/internal/storage"
+)
 
 type Storage struct {
 }
@@ -8,4 +13,15 @@ type Storage struct {
 func NewStorage(config *configs.Config) *Storage {
 
 	return &Storage{}
+}
+
+func (s *Storage) AddNewUser(ctx context.Context, user storage.User) error {
+
+	panic("no implemented: func (s *Storage) AddNewUser(ctx context.Context, user storage.User) error")
+}
+
+func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.User, error) {
+
+	panic("no implemented: func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.User, error)")
+
 }

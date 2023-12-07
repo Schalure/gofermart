@@ -11,6 +11,7 @@ import (
 //	Application configugation struct
 type AppConfig struct {
 	Env Environment `yaml:"Environment"`
+	PassRules string `yaml:"PasswordRules"`
 }
 
 //	Values for `yaml:"Environment"`
@@ -21,10 +22,12 @@ const (
 	Prod Environment = "prod"
 )
 
+//	Application configuration constructor
 func newAppConfig(fileName string) (*AppConfig, error) {
 
 	appConfig := AppConfig {
 		Env: Debug,
+		PassRules: `[0-9a-zA-Z]`,
 	}
 
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {

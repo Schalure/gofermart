@@ -59,25 +59,25 @@ func (c *EnvConfig) parseFlags() {
 	if isValidHostAddres(serviceHost) {
 		c.serviceHost = serviceHost
 	} else {
-		log.Printf("%s: serviceHost value is not valid: %s", pc, serviceHost)
+		log.Printf("Using value by default. %s: serviceHost value is not valid: %s", pc, serviceHost)
 	}
 
 	if isValidHostAddres(dbHost) {
 		c.dbHost = dbHost
 	} else {
-		log.Printf("%s: dbHost value is not valid: %s", pc, dbHost)
+		log.Printf("Using value by default. %s: dbHost value is not valid: %s", pc, dbHost)
 	}
 
 	if isValidHostAddres(accrualHost) {
 		c.accrualHost = accrualHost
 	} else {
-		log.Printf("%s: accrualHost value is not valid: %s", pc, accrualHost)
+		log.Printf("Using value by default. %s: accrualHost value is not valid: %s", pc, accrualHost)
 	}
 
 	if appConfigFilePath != "" {
 		c.appConfigFilePath = appConfigFilePath
 	} else {
-		log.Printf("%s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
+		log.Printf("Using value by default. %s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
 	}
 }
 
@@ -90,7 +90,7 @@ func (c *EnvConfig) parseEnvironmental() {
 		if isValidHostAddres(serviceHost) {
 			c.serviceHost = serviceHost
 		} else {
-			log.Printf("%s: serviceHost value is not valid: %s", pc, serviceHost)
+			log.Printf("Using value by default. %s: serviceHost value is not valid: %s", pc, serviceHost)
 		}
 	}
 
@@ -98,7 +98,7 @@ func (c *EnvConfig) parseEnvironmental() {
 		if isValidHostAddres(dbHost) {
 			c.dbHost = dbHost
 		} else {
-			log.Printf("%s: dbHost value is not valid: %s", pc, dbHost)
+			log.Printf("Using value by default. %s: dbHost value is not valid: %s", pc, dbHost)
 		}
 	}
 
@@ -106,7 +106,7 @@ func (c *EnvConfig) parseEnvironmental() {
 		if isValidHostAddres(accrualHost) {
 			c.serviceHost = accrualHost
 		} else {
-			log.Printf("%s: accrualHost value is not valid: %s", pc, accrualHost)
+			log.Printf("Using value by default. %s: accrualHost value is not valid: %s", pc, accrualHost)
 		}
 	}
 
@@ -114,7 +114,7 @@ func (c *EnvConfig) parseEnvironmental() {
 		if appConfigFilePath != "" {
 			c.appConfigFilePath = appConfigFilePath
 		} else {
-			log.Printf("%s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
+			log.Printf("Using value by default. %s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
 		}
 	}
 }
