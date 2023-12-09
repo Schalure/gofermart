@@ -9,6 +9,7 @@ import (
 	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/loggers"
+	"github.com/Schalure/gofermart/internal/storage"
 	"github.com/Schalure/gofermart/internal/storage/mockstor"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -83,6 +84,74 @@ func Test_CreateUser(t *testing.T) {
 				assert.Equal(t, test.want.passwordHash, user.Password)
 				assert.Equal(t, test.login, user.Login)
 			}
+
+			cancel()
+		})
+	}
+}
+
+func Test_UserAuthentication(t *testing.T) {
+	
+	testCases := []struct {
+		name string
+		loginToSave string
+		passwordToSave string
+		loginToCheck string
+		passwordToCheck string
+		want struct {
+			err error
+		}
+	}{
+		{
+			name: "simple test",
+			loginToSave: "Mihail",
+			passwordToSave: "q1w2e3r4",
+			loginToCheck: "Mihail",
+			passwordToCheck: "q1w2e3r4",
+			want: struct{err error}{
+				err: nil,
+			},
+		},
+		{
+			name: "bad login",
+			loginToSave: "Mihail",
+			passwordToSave: "q1w2e3r4",
+			loginToCheck: "Sasha",
+			passwordToCheck: "q1w2e3r4",
+			want: struct{err error}{
+				err: gofermaterrors.InvalidLoginPassword,
+			},
+		},		{
+			name: "bad password",
+			loginToSave: "Mihail",
+			passwordToSave: "q1w2e3r4",
+			loginToCheck: "Sasha",
+			passwordToCheck: "",
+			want: struct{err error}{
+				err: gofermaterrors.InvalidLoginPassword,
+			},
+		},
+	}
+
+	config, _ := configs.NewConfig()
+	logger := loggers.NewLogger(config)
+	stor := mockstor.NewStorage()
+	service := NewGofermart(config, stor, logger)
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+
+			user := storage.User {
+				Login: test.loginToSave,
+				Password: service.generatePasswordHash(test.passwordToSave),
+			}
+			stor.AddNewUser(context.Background(), user)
+
+
+			ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+			_, err := service.AuthenticationUser(ctx, test.loginToCheck, test.passwordToCheck)
+
+			assert.Equal(t, test.want.err, err)
 
 			cancel()
 		})
