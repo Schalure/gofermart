@@ -7,6 +7,8 @@ import (
 	"github.com/Schalure/gofermart/internal/gofermart"
 	"github.com/Schalure/gofermart/internal/loggers"
 	"github.com/Schalure/gofermart/internal/server"
+	"github.com/Schalure/gofermart/internal/server/handlers"
+	"github.com/Schalure/gofermart/internal/server/midlewares"
 	"github.com/Schalure/gofermart/internal/storage/postgrestor"
 )
 
@@ -30,9 +32,11 @@ func main() {
 	service := gofermart.NewGofermart(config, storage, logger)
 
 	log.Println("HTTP server initializing...")
-	server := server.NewServer(config, service)
+	handler := handlers.NewHandler(service)
+	midleware := midlewares.NewMidleware()
+	server := server.NewServer(config, handler, midleware)
 
 	log.Println("Gofermart service have been started...")
-	err = server.Run()
+	err = server.Run(config.EnvConfig.ServiceHost)
 	server.Stop(err)
 }

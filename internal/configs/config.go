@@ -12,7 +12,7 @@ type Config struct {
 func NewConfig() (*Config, error) {
 
 	envConfig := newEnvConfig()
-	appConfig, err := newAppConfig(envConfig.appConfigFilePath)
+	appConfig, err := newAppConfig(envConfig.AppConfigFilePath)
 
 
 	return &Config{

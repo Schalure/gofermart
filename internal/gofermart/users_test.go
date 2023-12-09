@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Schalure/gofermart/internal/configs"
+	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/loggers"
 	"github.com/Schalure/gofermart/internal/storage/mockstor"
 	"github.com/stretchr/testify/assert"
@@ -38,7 +39,7 @@ func Test_CreateUser(t *testing.T) {
 			login: "Misha",
 			password: "q1w2e3r4",
 			want: struct{err error; passwordHash string}{
-				err:  fmt.Errorf("a user with this login already exists"),
+				err:  gofermaterrors.LoginAlreadyTaken,
 				passwordHash: "",
 			},
 		},		
@@ -47,7 +48,7 @@ func Test_CreateUser(t *testing.T) {
 			login: "Nikita",
 			password: "q1",
 			want: struct{err error; passwordHash string}{
-				err:  fmt.Errorf("password is too short"),
+				err:  gofermaterrors.PasswordShort,
 				passwordHash: "",
 			},
 		},
@@ -56,7 +57,7 @@ func Test_CreateUser(t *testing.T) {
 			login: "Vova",
 			password: "q1w2e3r4%",
 			want: struct{err error; passwordHash string}{
-				err:  fmt.Errorf("the password can only be made of characters: 0-9, a-z, A-Z"),
+				err:  gofermaterrors.PasswordBad,
 				passwordHash: "",
 			},
 		},
@@ -71,8 +72,9 @@ func Test_CreateUser(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
-			err := service.CreateUser(ctx, test.login, test.password)
-			assert.Equal(t, test.want.err, err)
+			_, err := service.CreateUser(ctx, test.login, test.password)
+
+			assert.ErrorIs(t, err, test.want.err)
 
 			if err == nil {
 

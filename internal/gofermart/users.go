@@ -3,27 +3,35 @@ package gofermart
 import (
 	"context"
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/storage"
 	"github.com/golang-jwt/jwt/v4"
 )
 
-//	Create new user
-func (g *Gofermart) CreateUser(ctx context.Context, login, password string) error {
+//	Create new user. Return JSON Web Token (JWT)
+func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (string, error) {
+
+	pc := "func (g *Gofermart) CreateUser(ctx context.Context, login, password string) error"
 
 	if _, err := g.storager.GetUserByLogin(ctx, login); err == nil {
 		g.loggerer.Debugw(
-			"func (g *Gofermart) CreateUser(ctx context.Context, login, password string) error",
+			pc,
 			"error", err,
 		)
-		return fmt.Errorf("a user with this login already exists")
+		return "", gofermaterrors.LoginAlreadyTaken
 	}
 
 	if err := g.isPasswordValid(password); err != nil {
-		return err
+		g.loggerer.Debugw(
+			pc,
+			"error", err,
+		)
+		return "", err
 	}
 
 	user := storage.User {
@@ -31,7 +39,30 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) erro
 		Password: g.generatePasswordHash(password),
 	}
 
-	return g.storager.AddNewUser(ctx, user)
+	if err := g.storager.AddNewUser(ctx, user); err != nil {
+		g.loggerer.Debugw(
+			pc,
+			"error", err,
+		)
+		return "", gofermaterrors.Internal
+	}
+
+	token, err := g.generateJWT(login)
+	if err != nil {
+		g.loggerer.Debugw(
+			pc,
+			"error", err,
+		)
+		return "", gofermaterrors.Internal
+	}
+
+	g.loggerer.Debugw(
+		pc,
+		"create new user", login,
+		"token", token,
+	)
+
+	return token, nil
 }
 
 //	Authentication process for user. Return JSON Web Token (JWT)
@@ -45,7 +76,7 @@ func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password stri
 			pc,
 			"error", err,
 		)
-		return "", fmt.Errorf("invalid login or password")
+		return "", gofermaterrors.InvalidLoginPassword
 	}
 
 	if g.generatePasswordHash(password) != user.Password {
@@ -53,7 +84,7 @@ func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password stri
 			pc,
 			"error", "the password hash didn't match",
 		)
-		return "", fmt.Errorf("invalid login or password")
+		return "", gofermaterrors.InvalidLoginPassword
 	}
 
 	return g.generateJWT(login)
@@ -87,14 +118,17 @@ func (g *Gofermart) generateJWT(login string) (string, error) {
 //	Check to valid password
 func (g *Gofermart) isPasswordValid(password string) error {
 
+	var errs []error
+
 	if len(password) < PasswordMinLenght {
-		return fmt.Errorf("password is too short")
+		errs = append(errs, gofermaterrors.PasswordShort)
 	}
 
 	if !g.validPassword.MatchString(password) {
-		return fmt.Errorf("the password can only be made of characters: 0-9, a-z, A-Z")
+		errs = append(errs, gofermaterrors.PasswordBad)
 	}
-	return nil
+
+	return errors.Join(errs...)
 }
 
 //	Generate password hash
