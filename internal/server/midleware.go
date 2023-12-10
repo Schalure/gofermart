@@ -1,4 +1,4 @@
-package midlewares
+package server
 
 type Midleware struct {
 
