@@ -8,12 +8,11 @@ import (
 )
 
 type Storage struct {
-
 	Users map[string]storage.User
 }
 
 func NewStorage() *Storage {
-	
+
 	return &Storage{
 		Users: make(map[string]storage.User),
 	}

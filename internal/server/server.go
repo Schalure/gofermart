@@ -10,7 +10,7 @@ type Server struct {
 	router *chi.Mux
 }
 
-func NewServer(handler *Handler, midleware *Middleware) *Server  {
+func NewServer(handler *Handler, midleware *Middleware) *Server {
 
 	r := chi.NewRouter()
 
@@ -22,7 +22,7 @@ func NewServer(handler *Handler, midleware *Middleware) *Server  {
 	}
 }
 
-func (s* Server) Run(host string) error{
+func (s *Server) Run(host string) error {
 
 	return http.ListenAndServe(host, s.router)
 }
@@ -30,5 +30,3 @@ func (s* Server) Run(host string) error{
 func (s *Server) Stop(err error) {
 
 }
-
-

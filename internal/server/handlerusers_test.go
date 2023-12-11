@@ -13,8 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-
-
 func Test_UserRegistration(t *testing.T) {
 
 	mockController := gomock.NewController(t)
@@ -23,7 +21,7 @@ func Test_UserRegistration(t *testing.T) {
 	mockUserManager := mocks.NewMockUserManager(mockController)
 	mockLogger := mocks.NewMockLoggerer(mockController)
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
-	server := NewServer( NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
+	server := NewServer(NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
@@ -31,54 +29,65 @@ func Test_UserRegistration(t *testing.T) {
 	testMethod := "POST"
 	testURL := "/api/user/register"
 
-
-	testCases := []struct{
-		name string
+	testCases := []struct {
+		name        string
 		requestBody string
-		gomockCall *gomock.Call
-		want struct{
+		gomockCall  *gomock.Call
+		want        struct {
 			statusCode int
-			token string
+			token      string
 		}
 	}{
 		{
-			name: "simple test",
+			name:        "simple test",
 			requestBody: `{"login":"Mihail","password":"q1w2e3r4"}`,
-			gomockCall: mockUserManager.EXPECT().CreateUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("token", nil),
-			want: struct{statusCode int; token string}{
+			gomockCall:  mockUserManager.EXPECT().CreateUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("token", nil),
+			want: struct {
+				statusCode int
+				token      string
+			}{
 				statusCode: http.StatusOK,
-				token: "token",
+				token:      "token",
 			},
 		},
 		{
-			name: "dublicate test",
+			name:        "dublicate test",
 			requestBody: `{"login":"Mihail","password":"q1w2e3r4"}`,
-			gomockCall: mockUserManager.EXPECT().CreateUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("", gofermaterrors.LoginAlreadyTaken),
-			want: struct{statusCode int; token string}{
+			gomockCall:  mockUserManager.EXPECT().CreateUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("", gofermaterrors.LoginAlreadyTaken),
+			want: struct {
+				statusCode int
+				token      string
+			}{
 				statusCode: http.StatusConflict,
 			},
 		},
 		{
-			name: "bad body test",
+			name:        "bad body test",
 			requestBody: `bad request body`,
-			want: struct{statusCode int; token string}{
+			want: struct {
+				statusCode int
+				token      string
+			}{
 				statusCode: http.StatusBadRequest,
 			},
 		},
 		{
-			name: "empty body",
+			name:        "empty body",
 			requestBody: `{}`,
-			gomockCall: mockUserManager.EXPECT().CreateUser(gomock.Any(), "", "").Return("", gofermaterrors.InvalidLogin),
-			want: struct{statusCode int; token string}{
+			gomockCall:  mockUserManager.EXPECT().CreateUser(gomock.Any(), "", "").Return("", gofermaterrors.InvalidLogin),
+			want: struct {
+				statusCode int
+				token      string
+			}{
 				statusCode: http.StatusInternalServerError,
 			},
 		},
 	}
 
-	for _, test := range testCases{
+	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			req, err := http.NewRequest(testMethod, testServer.URL + testURL, bytes.NewBufferString(test.requestBody))
+			req, err := http.NewRequest(testMethod, testServer.URL+testURL, bytes.NewBufferString(test.requestBody))
 			require.NoError(t, err)
 
 			resp, err := testServer.Client().Do(req)
@@ -86,8 +95,7 @@ func Test_UserRegistration(t *testing.T) {
 
 			assert.Equal(t, test.want.statusCode, resp.StatusCode)
 
-			
-			assert.Equal(t, test.want.token, func () string {
+			assert.Equal(t, test.want.token, func() string {
 				cookies := resp.Cookies()
 				for _, cookie := range cookies {
 					if cookie.Name == authorizationCookie {
@@ -100,7 +108,6 @@ func Test_UserRegistration(t *testing.T) {
 	}
 }
 
-
 func Test_UserAuthentication(t *testing.T) {
 
 	mockController := gomock.NewController(t)
@@ -109,7 +116,7 @@ func Test_UserAuthentication(t *testing.T) {
 	mockUserManager := mocks.NewMockUserManager(mockController)
 	mockLogger := mocks.NewMockLoggerer(mockController)
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
-	server := NewServer( NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
+	server := NewServer(NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
@@ -118,43 +125,55 @@ func Test_UserAuthentication(t *testing.T) {
 	testURL := "/api/user/login"
 
 	testCases := []struct {
-		name string
+		name        string
 		requestBody string
-		gomockCall *gomock.Call
-		want struct{
+		gomockCall  *gomock.Call
+		want        struct {
 			statusCode int
-			token string
+			token      string
 		}
 	}{
 		{
-			name: "simple test",
+			name:        "simple test",
 			requestBody: `{"login":"Mihail","password":"q1w2e3r4"}`,
-			gomockCall: mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("token", nil),
-			want: struct{statusCode int; token string}{
+			gomockCall:  mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("token", nil),
+			want: struct {
+				statusCode int
+				token      string
+			}{
 				statusCode: http.StatusOK,
-				token: "token",
+				token:      "token",
 			},
 		},
 		{
-			name: "invalid login or password",
+			name:        "invalid login or password",
 			requestBody: `{"login":"Mihail","password":"q1w2e3r4"}`,
-			gomockCall: mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("", gofermaterrors.InvalidLoginPassword),
-			want: struct{statusCode int; token string}{
+			gomockCall:  mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("", gofermaterrors.InvalidLoginPassword),
+			want: struct {
+				statusCode int
+				token      string
+			}{
 				statusCode: http.StatusUnauthorized,
 			},
 		},
 		{
-			name: "bad body",
+			name:        "bad body",
 			requestBody: `bad body`,
-			want: struct{statusCode int; token string}{
+			want: struct {
+				statusCode int
+				token      string
+			}{
 				statusCode: http.StatusBadRequest,
 			},
 		},
 		{
-			name: "empty body",
+			name:        "empty body",
 			requestBody: `{}`,
-			gomockCall: mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "", "").Return("", gofermaterrors.InvalidLoginPassword),
-			want: struct{statusCode int; token string}{
+			gomockCall:  mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "", "").Return("", gofermaterrors.InvalidLoginPassword),
+			want: struct {
+				statusCode int
+				token      string
+			}{
 				statusCode: http.StatusUnauthorized,
 			},
 		},
@@ -163,7 +182,7 @@ func Test_UserAuthentication(t *testing.T) {
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			req, err := http.NewRequest(testMethod, testServer.URL + testURL, bytes.NewBufferString(test.requestBody))
+			req, err := http.NewRequest(testMethod, testServer.URL+testURL, bytes.NewBufferString(test.requestBody))
 			require.NoError(t, err)
 
 			resp, err := testServer.Client().Do(req)
@@ -171,8 +190,7 @@ func Test_UserAuthentication(t *testing.T) {
 
 			assert.Equal(t, test.want.statusCode, resp.StatusCode)
 
-			
-			assert.Equal(t, test.want.token, func () string {
+			assert.Equal(t, test.want.token, func() string {
 				cookies := resp.Cookies()
 				for _, cookie := range cookies {
 					if cookie.Name == authorizationCookie {

@@ -14,19 +14,20 @@ type TokenCheker interface {
 }
 
 type Middleware struct {
-	logger gofermart.Loggerer
+	logger      gofermart.Loggerer
 	tokenCheker TokenCheker
 }
 
 func NewMidleware(logger gofermart.Loggerer, tokenCheker TokenCheker) *Middleware {
 
 	return &Middleware{
-		logger: logger,
+		logger:      logger,
 		tokenCheker: tokenCheker,
 	}
 }
 
 type contextKey string
+
 const contextLoginKey contextKey = "LoginKey"
 
 func (m *Middleware) WithAuthentication(h http.Handler) http.Handler {

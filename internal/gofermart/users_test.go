@@ -17,66 +17,84 @@ import (
 
 func Test_CreateUser(t *testing.T) {
 
-	testCases := []struct{
-		name string
-		login string
+	testCases := []struct {
+		name     string
+		login    string
 		password string
-		want struct {
-			err error
+		want     struct {
+			err          error
 			passwordHash string
 		}
 	}{
 		{
-			name: "simple test",
-			login: "Misha",
+			name:     "simple test",
+			login:    "Misha",
 			password: "q1w2e3r4",
-			want: struct{err error; passwordHash string}{
-				err:  nil,
+			want: struct {
+				err          error
+				passwordHash string
+			}{
+				err:          nil,
 				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
 			},
 		},
 		{
-			name: "dublicate test",
-			login: "Misha",
+			name:     "dublicate test",
+			login:    "Misha",
 			password: "q1w2e3r4",
-			want: struct{err error; passwordHash string}{
-				err:  gofermaterrors.LoginAlreadyTaken,
+			want: struct {
+				err          error
+				passwordHash string
+			}{
+				err:          gofermaterrors.LoginAlreadyTaken,
 				passwordHash: "",
 			},
-		},		
+		},
 		{
-			name: "empty login test",
-			login: "",
+			name:     "empty login test",
+			login:    "",
 			password: "q1w2e3r4",
-			want: struct{err error; passwordHash string}{
-				err:  gofermaterrors.InvalidLogin,
+			want: struct {
+				err          error
+				passwordHash string
+			}{
+				err:          gofermaterrors.InvalidLogin,
 				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
 			},
 		},
 		{
-			name: "bad login test",
-			login: "Tema#",
+			name:     "bad login test",
+			login:    "Tema#",
 			password: "q1w2e3r4",
-			want: struct{err error; passwordHash string}{
-				err:  gofermaterrors.InvalidLogin,
+			want: struct {
+				err          error
+				passwordHash string
+			}{
+				err:          gofermaterrors.InvalidLogin,
 				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
 			},
 		},
 		{
-			name: "smol password test",
-			login: "Nikita",
+			name:     "smol password test",
+			login:    "Nikita",
 			password: "q1",
-			want: struct{err error; passwordHash string}{
-				err:  gofermaterrors.PasswordShort,
+			want: struct {
+				err          error
+				passwordHash string
+			}{
+				err:          gofermaterrors.PasswordShort,
 				passwordHash: "",
 			},
 		},
 		{
-			name: "bad password test",
-			login: "Vova",
+			name:     "bad password test",
+			login:    "Vova",
 			password: "q1w2e3r4%",
-			want: struct{err error; passwordHash string}{
-				err:  gofermaterrors.PasswordBad,
+			want: struct {
+				err          error
+				passwordHash string
+			}{
+				err:          gofermaterrors.PasswordBad,
 				passwordHash: "",
 			},
 		},
@@ -84,12 +102,12 @@ func Test_CreateUser(t *testing.T) {
 
 	logger := loggers.NewLogger(configs.Debug)
 	stor := mockstor.NewStorage()
-	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, time.Hour * 1)
+	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, time.Hour*1)
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			_, err := service.CreateUser(ctx, test.login, test.password)
 
 			assert.ErrorIs(t, err, test.want.err)
@@ -108,43 +126,43 @@ func Test_CreateUser(t *testing.T) {
 }
 
 func Test_UserAuthentication(t *testing.T) {
-	
+
 	testCases := []struct {
-		name string
-		loginToSave string
-		passwordToSave string
-		loginToCheck string
+		name            string
+		loginToSave     string
+		passwordToSave  string
+		loginToCheck    string
 		passwordToCheck string
-		want struct {
+		want            struct {
 			err error
 		}
 	}{
 		{
-			name: "simple test",
-			loginToSave: "Mihail",
-			passwordToSave: "q1w2e3r4",
-			loginToCheck: "Mihail",
+			name:            "simple test",
+			loginToSave:     "Mihail",
+			passwordToSave:  "q1w2e3r4",
+			loginToCheck:    "Mihail",
 			passwordToCheck: "q1w2e3r4",
-			want: struct{err error}{
+			want: struct{ err error }{
 				err: nil,
 			},
 		},
 		{
-			name: "bad login",
-			loginToSave: "Mihail",
-			passwordToSave: "q1w2e3r4",
-			loginToCheck: "Sasha",
+			name:            "bad login",
+			loginToSave:     "Mihail",
+			passwordToSave:  "q1w2e3r4",
+			loginToCheck:    "Sasha",
 			passwordToCheck: "q1w2e3r4",
-			want: struct{err error}{
+			want: struct{ err error }{
 				err: gofermaterrors.InvalidLoginPassword,
 			},
-		},		{
-			name: "bad password",
-			loginToSave: "Mihail",
-			passwordToSave: "q1w2e3r4",
-			loginToCheck: "Sasha",
+		}, {
+			name:            "bad password",
+			loginToSave:     "Mihail",
+			passwordToSave:  "q1w2e3r4",
+			loginToCheck:    "Sasha",
 			passwordToCheck: "",
-			want: struct{err error}{
+			want: struct{ err error }{
 				err: gofermaterrors.InvalidLoginPassword,
 			},
 		},
@@ -152,19 +170,18 @@ func Test_UserAuthentication(t *testing.T) {
 
 	logger := loggers.NewLogger(configs.Debug)
 	stor := mockstor.NewStorage()
-	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, time.Hour * 1)
+	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, time.Hour*1)
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
-			user := storage.User {
-				Login: test.loginToSave,
+			user := storage.User{
+				Login:    test.loginToSave,
 				Password: service.generatePasswordHash(test.passwordToSave),
 			}
 			stor.AddNewUser(context.Background(), user)
 
-
-			ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			_, err := service.AuthenticationUser(ctx, test.loginToCheck, test.passwordToCheck)
 
 			assert.Equal(t, test.want.err, err)

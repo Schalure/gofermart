@@ -7,17 +7,14 @@ type Config struct {
 	AppConfig AppConfig
 }
 
-
 // Consructor of Config object
 func NewConfig() (*Config, error) {
 
 	envConfig := newEnvConfig()
 	appConfig, err := newAppConfig(envConfig.AppConfigFilePath)
 
-
 	return &Config{
 		EnvConfig: *envConfig,
 		AppConfig: *appConfig,
 	}, err
 }
-

@@ -32,9 +32,9 @@ const (
 func newEnvConfig() *EnvConfig {
 
 	envConfig := EnvConfig{
-		ServiceHost: defaultServiceHost,
-		DBHost: defaultDBHost,
-		AccrualHost: defaultAccrualHost,
+		ServiceHost:       defaultServiceHost,
+		DBHost:            defaultDBHost,
+		AccrualHost:       defaultAccrualHost,
 		AppConfigFilePath: defaultAppConfigFilePath,
 	}
 

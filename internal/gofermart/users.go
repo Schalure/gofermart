@@ -13,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-//	Create new user. Return JSON Web Token (JWT)
+// Create new user. Return JSON Web Token (JWT)
 func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (string, error) {
 
 	pc := "func (g *Gofermart) CreateUser(ctx context.Context, login, password string) error"
@@ -43,8 +43,8 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 		return "", err
 	}
 
-	user := storage.User {
-		Login: login,
+	user := storage.User{
+		Login:    login,
 		Password: g.generatePasswordHash(password),
 	}
 
@@ -74,7 +74,7 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 	return token, nil
 }
 
-//	Authentication process for user. Return JSON Web Token (JWT)
+// Authentication process for user. Return JSON Web Token (JWT)
 func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password string) (string, error) {
 
 	pc := "func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password string) (string, error)"
@@ -99,13 +99,13 @@ func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password stri
 	return g.generateJWT(login)
 }
 
-//	Claims of JSON Web Token (JWT)
+// Claims of JSON Web Token (JWT)
 type Claims struct {
 	jwt.RegisteredClaims
 	Login string
 }
 
-//	Check valid JSON Web Token (JWT)
+// Check valid JSON Web Token (JWT)
 func (g *Gofermart) CheckValidJWT(tokenString string) (string, error) {
 
 	claims := &Claims{}
@@ -122,14 +122,14 @@ func (g *Gofermart) CheckValidJWT(tokenString string) (string, error) {
 		return "", errors.New("token not valid")
 	}
 
-	if claims.RegisteredClaims.ExpiresAt.Time.After(time.Now()){
+	if claims.RegisteredClaims.ExpiresAt.Time.After(time.Now()) {
 		return "", errors.New("token obsolete")
 	}
 
 	return claims.Login, nil
 }
 
-//	Generate JSON Web Token (JWT)
+// Generate JSON Web Token (JWT)
 func (g *Gofermart) generateJWT(login string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
@@ -147,7 +147,7 @@ func (g *Gofermart) generateJWT(login string) (string, error) {
 	return tokenString, nil
 }
 
-//	Check to valid login
+// Check to valid login
 func (g *Gofermart) isLoginValid(login string) error {
 
 	if len(login) == 0 {
@@ -161,7 +161,7 @@ func (g *Gofermart) isLoginValid(login string) error {
 	return nil
 }
 
-//	Check to valid password
+// Check to valid password
 func (g *Gofermart) isPasswordValid(password string) error {
 
 	var errs []error
@@ -177,7 +177,7 @@ func (g *Gofermart) isPasswordValid(password string) error {
 	return errors.Join(errs...)
 }
 
-//	Generate password hash
+// Generate password hash
 func (g *Gofermart) generatePasswordHash(password string) string {
 
 	salt := "m1xFdMsf"

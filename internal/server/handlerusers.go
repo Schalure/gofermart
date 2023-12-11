@@ -12,13 +12,13 @@ import (
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 )
 
-//	User autotification type
+// User autotification type
 type authenticationData struct {
-	Login string `json:"login"`
+	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
-//	User registration handler. POST /api/user/register
+// User registration handler. POST /api/user/register
 func (h *Handler) UserRegistration(response http.ResponseWriter, request *http.Request) {
 
 	authData, err := getAuthenticationData(request.Body)
@@ -27,7 +27,7 @@ func (h *Handler) UserRegistration(response http.ResponseWriter, request *http.R
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(request.Context(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(request.Context(), 5*time.Second)
 	defer cancel()
 	token, err := h.userManager.CreateUser(ctx, authData.Login, authData.Password)
 	if err != nil {
@@ -39,14 +39,14 @@ func (h *Handler) UserRegistration(response http.ResponseWriter, request *http.R
 		return
 	}
 
-	http.SetCookie(response,  &http.Cookie{
+	http.SetCookie(response, &http.Cookie{
 		Name:  authorizationCookie,
 		Value: token,
 	})
 	response.WriteHeader(http.StatusOK)
 }
 
-//	User authentication handler. POST /api/user/login
+// User authentication handler. POST /api/user/login
 func (h *Handler) UserAuthentication(response http.ResponseWriter, request *http.Request) {
 
 	authData, err := getAuthenticationData(request.Body)
@@ -55,7 +55,7 @@ func (h *Handler) UserAuthentication(response http.ResponseWriter, request *http
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(request.Context(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(request.Context(), 5*time.Second)
 	defer cancel()
 	token, err := h.userManager.AuthenticationUser(ctx, authData.Login, authData.Password)
 	if err != nil {
@@ -66,14 +66,14 @@ func (h *Handler) UserAuthentication(response http.ResponseWriter, request *http
 		http.Error(response, gofermaterrors.Internal.Error(), http.StatusInternalServerError)
 	}
 
-	http.SetCookie(response,  &http.Cookie{
+	http.SetCookie(response, &http.Cookie{
 		Name:  authorizationCookie,
 		Value: token,
 	})
 	response.WriteHeader(http.StatusOK)
 }
 
-//	Get authentication data
+// Get authentication data
 func getAuthenticationData(r io.Reader) (authenticationData, error) {
 
 	var buf bytes.Buffer
