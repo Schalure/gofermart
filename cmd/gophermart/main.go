@@ -31,7 +31,7 @@ func main() {
 
 	log.Println("HTTP server initializing...")
 	handler := server.NewHandler(service)
-	midleware := server.NewMidleware()
+	midleware := server.NewMidleware(logger, service)
 	server := server.NewServer(config, handler, midleware)
 
 	log.Println("Gofermart service have been started...")

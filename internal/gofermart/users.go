@@ -105,6 +105,30 @@ type Claims struct {
 	Login string
 }
 
+//	Check valid JSON Web Token (JWT)
+func (g *Gofermart) CheckValidJWT(tokenString string) (string, error) {
+
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return "", fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return []byte(g.secretKey), nil
+	})
+	if err != nil {
+		return "", errors.New("can't parse token string")
+	}
+	if !token.Valid {
+		return "", errors.New("token not valid")
+	}
+
+	if claims.RegisteredClaims.ExpiresAt.Time.After(time.Now()){
+		return "", errors.New("token obsolete")
+	}
+
+	return claims.Login, nil
+}
+
 //	Generate JSON Web Token (JWT)
 func (g *Gofermart) generateJWT(login string) (string, error) {
 
@@ -120,7 +144,6 @@ func (g *Gofermart) generateJWT(login string) (string, error) {
 		return "", err
 	}
 
-	// возвращаем строку токена
 	return tokenString, nil
 }
 

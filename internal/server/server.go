@@ -11,7 +11,7 @@ type Server struct {
 	router *chi.Mux
 }
 
-func NewServer(config *configs.Config, handler *Handler, midleware *Midleware) *Server  {
+func NewServer(config *configs.Config, handler *Handler, midleware *Middleware) *Server  {
 
 	r := chi.NewRouter()
 

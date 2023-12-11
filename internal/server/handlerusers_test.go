@@ -23,7 +23,9 @@ func Test_UserRegistration(t *testing.T) {
 
 	config, _ := configs.NewConfig()
 	mockUserManager := mocks.NewMockUserManager(mockController)
-	server := NewServer(config, NewHandler(mockUserManager), NewMidleware())
+	mockLogger := mocks.NewMockLoggerer(mockController)
+	tokenCheker := mocks.NewMockTokenCheker(mockController)
+	server := NewServer(config, NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
@@ -108,7 +110,9 @@ func Test_UserAuthentication(t *testing.T) {
 
 	config, _ := configs.NewConfig()
 	mockUserManager := mocks.NewMockUserManager(mockController)
-	server := NewServer(config, NewHandler(mockUserManager), NewMidleware())
+	mockLogger := mocks.NewMockLoggerer(mockController)
+	tokenCheker := mocks.NewMockTokenCheker(mockController)
+	server := NewServer(config, NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
