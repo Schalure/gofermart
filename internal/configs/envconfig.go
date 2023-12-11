@@ -10,10 +10,10 @@ import (
 )
 
 type EnvConfig struct {
-	serviceHost       string
-	dbHost            string
-	accrualHost       string
-	appConfigFilePath string
+	ServiceHost       string
+	DBHost            string
+	AccrualHost       string
+	AppConfigFilePath string
 }
 
 // Package constants
@@ -32,10 +32,10 @@ const (
 func newEnvConfig() *EnvConfig {
 
 	envConfig := EnvConfig{
-		serviceHost: defaultServiceHost,
-		dbHost: defaultDBHost,
-		accrualHost: defaultAccrualHost,
-		appConfigFilePath: defaultAppConfigFilePath,
+		ServiceHost:       defaultServiceHost,
+		DBHost:            defaultDBHost,
+		AccrualHost:       defaultAccrualHost,
+		AppConfigFilePath: defaultAppConfigFilePath,
 	}
 
 	envConfig.parseFlags()
@@ -57,27 +57,27 @@ func (c *EnvConfig) parseFlags() {
 	flag.Parse()
 
 	if isValidHostAddres(serviceHost) {
-		c.serviceHost = serviceHost
+		c.ServiceHost = serviceHost
 	} else {
-		log.Printf("%s: serviceHost value is not valid: %s", pc, serviceHost)
+		log.Printf("Using value by default. %s: serviceHost value is not valid: %s", pc, serviceHost)
 	}
 
 	if isValidHostAddres(dbHost) {
-		c.dbHost = dbHost
+		c.DBHost = dbHost
 	} else {
-		log.Printf("%s: dbHost value is not valid: %s", pc, dbHost)
+		log.Printf("Using value by default. %s: dbHost value is not valid: %s", pc, dbHost)
 	}
 
 	if isValidHostAddres(accrualHost) {
-		c.accrualHost = accrualHost
+		c.AccrualHost = accrualHost
 	} else {
-		log.Printf("%s: accrualHost value is not valid: %s", pc, accrualHost)
+		log.Printf("Using value by default. %s: accrualHost value is not valid: %s", pc, accrualHost)
 	}
 
 	if appConfigFilePath != "" {
-		c.appConfigFilePath = appConfigFilePath
+		c.AppConfigFilePath = appConfigFilePath
 	} else {
-		log.Printf("%s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
+		log.Printf("Using value by default. %s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
 	}
 }
 
@@ -88,33 +88,33 @@ func (c *EnvConfig) parseEnvironmental() {
 
 	if serviceHost, ok := os.LookupEnv(envNameServiceHost); ok {
 		if isValidHostAddres(serviceHost) {
-			c.serviceHost = serviceHost
+			c.ServiceHost = serviceHost
 		} else {
-			log.Printf("%s: serviceHost value is not valid: %s", pc, serviceHost)
+			log.Printf("Using value by default. %s: serviceHost value is not valid: %s", pc, serviceHost)
 		}
 	}
 
 	if dbHost, ok := os.LookupEnv(envNameDBHost); ok {
 		if isValidHostAddres(dbHost) {
-			c.dbHost = dbHost
+			c.DBHost = dbHost
 		} else {
-			log.Printf("%s: dbHost value is not valid: %s", pc, dbHost)
+			log.Printf("Using value by default. %s: dbHost value is not valid: %s", pc, dbHost)
 		}
 	}
 
 	if accrualHost, ok := os.LookupEnv(envNameAccrualHost); ok {
 		if isValidHostAddres(accrualHost) {
-			c.serviceHost = accrualHost
+			c.ServiceHost = accrualHost
 		} else {
-			log.Printf("%s: accrualHost value is not valid: %s", pc, accrualHost)
+			log.Printf("Using value by default. %s: accrualHost value is not valid: %s", pc, accrualHost)
 		}
 	}
 
 	if appConfigFilePath, ok := os.LookupEnv(envAppConfigFilePath); ok {
 		if appConfigFilePath != "" {
-			c.appConfigFilePath = appConfigFilePath
+			c.AppConfigFilePath = appConfigFilePath
 		} else {
-			log.Printf("%s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
+			log.Printf("Using value by default. %s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
 		}
 	}
 }

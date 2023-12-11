@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/Schalure/gofermart/internal/configs"
-	"github.com/Schalure/gofermart/internal/gofermart"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 )
 
@@ -10,22 +10,23 @@ type Server struct {
 	router *chi.Mux
 }
 
-func NewServer(config *configs.Config, service *gofermart.Gofermart) *Server  {
+func NewServer(handler *Handler, midleware *Middleware) *Server {
 
 	r := chi.NewRouter()
+
+	r.Post("/api/user/register", handler.UserRegistration)
+	r.Post("/api/user/login", handler.UserAuthentication)
 
 	return &Server{
 		router: r,
 	}
 }
 
-func (s* Server) Run() error{
+func (s *Server) Run(host string) error {
 
-	return nil
+	return http.ListenAndServe(host, s.router)
 }
 
 func (s *Server) Stop(err error) {
 
 }
-
-

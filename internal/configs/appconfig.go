@@ -4,27 +4,44 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
 
-//	Application configugation struct
+// Application configugation struct
 type AppConfig struct {
-	Env Environment `yaml:"Environment"`
+	Env        Environment   `yaml:"Environment"`
+	LoginRules string        `yaml:"LoginRules"`
+	PassRules  string        `yaml:"PasswordRules"`
+	TokenTTL   time.Duration `yaml:"TokenTimeToLife"`
 }
 
-//	Values for `yaml:"Environment"`
+// Values for `yaml:"Environment"`
 type Environment string
+
 const (
 	Debug Environment = "debug"
 	Local Environment = "local"
-	Prod Environment = "prod"
+	Prod  Environment = "prod"
 )
 
+// Default application configugation values
+const (
+	defaultEnv        = Debug
+	defaultLoginRules = `[0-9a-zA-Z@._]`
+	defaultPassRules  = `[0-9a-zA-Z]`
+	defaultTokenTTL   = time.Hour * 1
+)
+
+// Application configuration constructor
 func newAppConfig(fileName string) (*AppConfig, error) {
 
-	appConfig := AppConfig {
-		Env: Debug,
+	appConfig := AppConfig{
+		Env:        defaultEnv,
+		LoginRules: defaultLoginRules,
+		PassRules:  defaultPassRules,
+		TokenTTL:   defaultTokenTTL,
 	}
 
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {
@@ -39,10 +56,10 @@ func newAppConfig(fileName string) (*AppConfig, error) {
 	return &appConfig, nil
 }
 
-//	Create application config file with default values
+// Create application config file with default values
 func (c *AppConfig) createAppConfigFile(fileName string) error {
 
-	file, err :=  os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("can't create application config file: \"%s\"", fileName)
 	}
@@ -59,7 +76,7 @@ func (c *AppConfig) createAppConfigFile(fileName string) error {
 	return nil
 }
 
-//	Get application config from file
+// Get application config from file
 func (c *AppConfig) getAppConfigFromFile(fileName string) error {
 
 	data, err := os.ReadFile(fileName)

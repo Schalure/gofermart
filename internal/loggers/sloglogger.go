@@ -11,11 +11,11 @@ type Logger struct {
 	logger *slog.Logger
 }
 
-func NewLogger(config *configs.Config) *Logger {
+func NewLogger(environment configs.Environment) *Logger {
 
 	var loggerLevel slog.Level
 
-	switch config.AppConfig.Env {
+	switch environment {
 	case configs.Debug:
 		loggerLevel = slog.LevelDebug
 	case configs.Local:
@@ -33,4 +33,16 @@ func NewLogger(config *configs.Config) *Logger {
 	return &Logger{
 		logger: logger,
 	}
+}
+
+func (l *Logger) Info(args ...interface{}) {
+	l.logger.Info("", args...)
+}
+
+func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
+	l.logger.Info("msg", keysAndValues...)
+}
+
+func (l *Logger) Debugw(msg string, keysAndValues ...interface{}) {
+	l.logger.Debug("msg", keysAndValues...)
 }
