@@ -21,6 +21,7 @@ type Gofermart struct {
 
 	validPassword *regexp.Regexp
 	validLogin    *regexp.Regexp
+	validOrderNumber *regexp.Regexp
 	tokenTTL      time.Duration
 	secretKey     string
 }
@@ -41,10 +42,11 @@ type Storager interface {
 }
 
 // Constructor of gofermart service object
-func NewGofermart(s Storager, l Loggerer, loginRules, passRules string, tokenTTL time.Duration) *Gofermart {
+func NewGofermart(s Storager, l Loggerer, loginRules, passRules, OrderNumberRules string, tokenTTL time.Duration) *Gofermart {
 
 	validLogin := regexp.MustCompile(`^` + loginRules + `+$`)
 	validPassword := regexp.MustCompile(`^` + passRules + `+$`)
+	validOrderNumber := regexp.MustCompile(`^` + OrderNumberRules + `+$`)
 
 	return &Gofermart{
 		storager: s,
@@ -52,6 +54,7 @@ func NewGofermart(s Storager, l Loggerer, loginRules, passRules string, tokenTTL
 
 		validLogin:    validLogin,
 		validPassword: validPassword,
+		validOrderNumber: validOrderNumber,
 		tokenTTL:      tokenTTL,
 		secretKey:     defaultSecretKey,
 	}

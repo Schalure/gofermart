@@ -27,7 +27,14 @@ func main() {
 	storage := postgrestor.NewStorage()
 
 	log.Println("Service initializing...")
-	service := gofermart.NewGofermart(storage, logger, config.AppConfig.LoginRules, config.AppConfig.PassRules, config.AppConfig.TokenTTL)
+	service := gofermart.NewGofermart(
+		storage, 
+		logger, 
+		config.AppConfig.LoginRules, 
+		config.AppConfig.PassRules, 
+		config.AppConfig.OrderNumberRules, 
+		config.AppConfig.TokenTTL,
+	)
 
 	log.Println("HTTP server initializing...")
 	handler := server.NewHandler(service)

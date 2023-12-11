@@ -22,6 +22,7 @@ func Test_createAppConfigFile(t *testing.T) {
 			name: "simple test",
 			appConfig: AppConfig{
 				Env:        Debug,
+				OrderNumberRules: defaultOrderNumberRules,
 				LoginRules: defaultLoginRules,
 				PassRules:  defaultPassRules,
 				TokenTTL:   defaultTokenTTL,
@@ -66,6 +67,7 @@ func Test_getAppConfigFromFile(t *testing.T) {
 					Env:        Prod,
 					LoginRules: defaultLoginRules,
 					PassRules:  defaultPassRules,
+					OrderNumberRules: defaultOrderNumberRules,
 					TokenTTL:   time.Hour*2 + time.Minute*30 + time.Second*10,
 				},
 			},
