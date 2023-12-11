@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/storage"
 )
 
@@ -37,15 +36,15 @@ type Loggerer interface {
 //	Interface of work with the repository
 //go:generate mockgen -destination=../mocks/mock_storager.go -package=mocks github.com/Schalure/gofermart/internal/gofermart Storager
 type Storager interface {
-	AddNewUser(ctx context.Context, user  storage.User) error
+	AddNewUser(ctx context.Context, user storage.User) error
 	GetUserByLogin(ctx context.Context, login string) (storage.User, error)
 }
 
 //	Constructor of gofermart service object
-func NewGofermart(config *configs.Config, s Storager, l Loggerer) *Gofermart {
+func NewGofermart(s Storager, l Loggerer, loginRules, passRules string, tokenTTL time.Duration) *Gofermart {
 
-	validLogin := regexp.MustCompile(`^` + config.AppConfig.LoginRules + `+$`)
-	validPassword := regexp.MustCompile(`^` + config.AppConfig.PassRules + `+$`)
+	validLogin := regexp.MustCompile(`^` + loginRules + `+$`)
+	validPassword := regexp.MustCompile(`^` + passRules + `+$`)
 
 	return &Gofermart{
 		storager: s,
@@ -53,7 +52,7 @@ func NewGofermart(config *configs.Config, s Storager, l Loggerer) *Gofermart {
 
 		validLogin: validLogin,
 		validPassword: validPassword,
-		tokenTTL: config.AppConfig.TokenTTL,
+		tokenTTL: tokenTTL,
 		secretKey: defaultSecretKey,
 	}
 }

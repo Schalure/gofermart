@@ -82,10 +82,9 @@ func Test_CreateUser(t *testing.T) {
 		},
 	}
 
-	config, _ := configs.NewConfig()
-	logger := loggers.NewLogger(config)
+	logger := loggers.NewLogger(configs.Debug)
 	stor := mockstor.NewStorage()
-	service := NewGofermart(config, stor, logger)
+	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, time.Hour * 1)
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -151,10 +150,9 @@ func Test_UserAuthentication(t *testing.T) {
 		},
 	}
 
-	config, _ := configs.NewConfig()
-	logger := loggers.NewLogger(config)
+	logger := loggers.NewLogger(configs.Debug)
 	stor := mockstor.NewStorage()
-	service := NewGofermart(config, stor, logger)
+	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, time.Hour * 1)
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {

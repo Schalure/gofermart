@@ -11,11 +11,11 @@ type Logger struct {
 	logger *slog.Logger
 }
 
-func NewLogger(config *configs.Config) *Logger {
+func NewLogger(environment configs.Environment) *Logger {
 
 	var loggerLevel slog.Level
 
-	switch config.AppConfig.Env {
+	switch environment {
 	case configs.Debug:
 		loggerLevel = slog.LevelDebug
 	case configs.Local:

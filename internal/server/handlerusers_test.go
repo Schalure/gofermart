@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/mocks"
 	"github.com/golang/mock/gomock"
@@ -21,11 +20,10 @@ func Test_UserRegistration(t *testing.T) {
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
-	config, _ := configs.NewConfig()
 	mockUserManager := mocks.NewMockUserManager(mockController)
 	mockLogger := mocks.NewMockLoggerer(mockController)
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
-	server := NewServer(config, NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
+	server := NewServer( NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
@@ -108,11 +106,10 @@ func Test_UserAuthentication(t *testing.T) {
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
-	config, _ := configs.NewConfig()
 	mockUserManager := mocks.NewMockUserManager(mockController)
 	mockLogger := mocks.NewMockLoggerer(mockController)
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
-	server := NewServer(config, NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
+	server := NewServer( NewHandler(mockUserManager), NewMidleware(mockLogger, tokenCheker))
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()

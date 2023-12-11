@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -11,7 +10,7 @@ type Server struct {
 	router *chi.Mux
 }
 
-func NewServer(config *configs.Config, handler *Handler, midleware *Middleware) *Server  {
+func NewServer(handler *Handler, midleware *Middleware) *Server  {
 
 	r := chi.NewRouter()
 

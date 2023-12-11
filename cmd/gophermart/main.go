@@ -21,18 +21,18 @@ func main() {
 	}
 
 	log.Println("Logger initializing...")
-	logger := loggers.NewLogger(config)
+	logger := loggers.NewLogger(config.AppConfig.Env)
 
 	log.Println("Storage initializing...")
-	storage := postgrestor.NewStorage(config)
+	storage := postgrestor.NewStorage()
 	
 	log.Println("Service initializing...")
-	service := gofermart.NewGofermart(config, storage, logger)
+	service := gofermart.NewGofermart(storage, logger, config.AppConfig.LoginRules, config.AppConfig.PassRules, config.AppConfig.TokenTTL)
 
 	log.Println("HTTP server initializing...")
 	handler := server.NewHandler(service)
 	midleware := server.NewMidleware(logger, service)
-	server := server.NewServer(config, handler, midleware)
+	server := server.NewServer(handler, midleware)
 
 	log.Println("Gofermart service have been started...")
 	err = server.Run(config.EnvConfig.ServiceHost)

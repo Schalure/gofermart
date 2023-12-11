@@ -3,14 +3,13 @@ package postgrestor
 import (
 	"context"
 
-	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/storage"
 )
 
 type Storage struct {
 }
 
-func NewStorage(config *configs.Config) *Storage {
+func NewStorage() *Storage {
 
 	return &Storage{}
 }
