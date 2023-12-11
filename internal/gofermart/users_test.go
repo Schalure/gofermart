@@ -45,6 +45,24 @@ func Test_CreateUser(t *testing.T) {
 			},
 		},		
 		{
+			name: "empty login test",
+			login: "",
+			password: "q1w2e3r4",
+			want: struct{err error; passwordHash string}{
+				err:  gofermaterrors.InvalidLogin,
+				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
+			},
+		},
+		{
+			name: "bad login test",
+			login: "Tema#",
+			password: "q1w2e3r4",
+			want: struct{err error; passwordHash string}{
+				err:  gofermaterrors.InvalidLogin,
+				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
+			},
+		},
+		{
 			name: "smol password test",
 			login: "Nikita",
 			password: "q1",

@@ -10,6 +10,7 @@ const (
 
 
 //	Interface for interaction with users
+//go:generate mockgen -destination=../mocks/mock_usermanager.go -package=mocks github.com/Schalure/gofermart/internal/server UserManager
 type UserManager interface {
 	CreateUser(ctx context.Context, login, password string) (string, error)
 	AuthenticationUser(ctx context.Context, login, password string) (string, error)

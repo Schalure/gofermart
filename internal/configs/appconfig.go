@@ -12,6 +12,7 @@ import (
 //	Application configugation struct
 type AppConfig struct {
 	Env Environment `yaml:"Environment"`
+	LoginRules string `yaml:"LoginRules"`
 	PassRules string `yaml:"PasswordRules"`
 	TokenTTL time.Duration `yaml:"TokenTimeToLife"`
 }
@@ -27,6 +28,7 @@ const (
 //	Default application configugation values
 const (
 	defaultEnv = Debug
+	defaultLoginRules = `[0-9a-zA-Z@._]`
 	defaultPassRules = `[0-9a-zA-Z]`
 	defaultTokenTTL = time.Hour * 1
 )
@@ -36,6 +38,7 @@ func newAppConfig(fileName string) (*AppConfig, error) {
 
 	appConfig := AppConfig {
 		Env: defaultEnv,
+		LoginRules: defaultLoginRules,
 		PassRules: defaultPassRules,
 		TokenTTL: defaultTokenTTL,
 	}

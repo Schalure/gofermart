@@ -18,6 +18,15 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 
 	pc := "func (g *Gofermart) CreateUser(ctx context.Context, login, password string) error"
 
+	if err := g.isLoginValid(login); err != nil {
+		g.loggerer.Debugw(
+			pc,
+			"error", err,
+			"login", login,
+		)
+		return "", gofermaterrors.InvalidLogin
+	}
+
 	if _, err := g.storager.GetUserByLogin(ctx, login); err == nil {
 		g.loggerer.Debugw(
 			pc,
@@ -113,6 +122,20 @@ func (g *Gofermart) generateJWT(login string) (string, error) {
 
 	// возвращаем строку токена
 	return tokenString, nil
+}
+
+//	Check to valid login
+func (g *Gofermart) isLoginValid(login string) error {
+
+	if len(login) == 0 {
+		return gofermaterrors.InvalidLogin
+	}
+
+	if !g.validLogin.MatchString(login) {
+		return gofermaterrors.InvalidLogin
+	}
+
+	return nil
 }
 
 //	Check to valid password
