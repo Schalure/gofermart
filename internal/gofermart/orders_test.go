@@ -6,7 +6,7 @@ import (
 
 	"github.com/Schalure/gofermart/internal/mocks"
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_isOrderValid(t *testing.T) {
@@ -16,10 +16,49 @@ func Test_isOrderValid(t *testing.T) {
 
 	stor := mocks.NewMockStorager(mockController)
 	logger := mocks.NewMockLoggerer(mockController)
-
 	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
 
-	ok := service.isOrderValid("123456789")
+	testCases := []struct {
+		name string
+		inpString string
+		want bool
+	}{
+		{
+			name: "simple even test",
+			inpString: "4561261212345467",
+			want: true,
+		},
+		{
+			name: "bad even test",
+			inpString: "4561261212345464",
+			want: false,
+		},		{
+			name: "simple odd test",
+			inpString: "1234567897",
+			want: true,
+		},
+		{
+			name: "bad odd test",
+			inpString: "1234547897",
+			want: false,
+		},
+		{
+			name: "empty seq test",
+			inpString: "",
+			want: false,
+		},
+		{
+			name: "bad seq test",
+			inpString: "4561261212%45467",
+			want: false,
+		},
+	}
 
-	require.NotEqualValues(t, true, ok)
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+
+			ok := service.isOrderValid(test.inpString)
+			assert.EqualValues(t, test.want, ok)
+		})
+	}
 }
