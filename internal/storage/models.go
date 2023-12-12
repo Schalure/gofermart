@@ -19,9 +19,18 @@ func (u User) String() string {
 	return string(data)
 }
 
+//	Доступные статусы обработки расчётов:
+type OrderStatus string
+const (
+	OrderStatusNew OrderStatus = "NEW"	//	заказ загружен в систему, но не попал в обработку
+	OrderStatusProcessing = "PROCESSING"	//	вознаграждение за заказ рассчитывается
+	OrderStatusInvalid = "INVALID"	//	система расчёта вознаграждений отказала в расчёте
+	OrderStatusProcessed = "PROCESSED"	//	данные по заказу проверены и информация о расчёте успешно получена
+)
+
 type Order struct {
 	OrderNumber string `json:"number" db:"order_number"`
-	OrderStatus string `json:"status" db:"order_status"`
+	OrderStatus OrderStatus `json:"status" db:"order_status"`
 	BonusPoints string `json:"accural" db:"bonus_points"`
 	UploadedAt time.Time `json:"uploaded_at" db:"uploaded_at"`
 	UserLogin string `json:"login" db:"user_login"`

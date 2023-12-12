@@ -19,6 +19,8 @@ type Gofermart struct {
 	storager Storager
 	loggerer Loggerer
 
+	orderProvider *OrderProvider
+
 	validPassword *regexp.Regexp
 	validLogin    *regexp.Regexp
 	validOrderNumber *regexp.Regexp
@@ -39,6 +41,9 @@ type Loggerer interface {
 type Storager interface {
 	AddNewUser(ctx context.Context, user storage.User) error
 	GetUserByLogin(ctx context.Context, login string) (storage.User, error)
+	AddNewOrder(ctx context.Context, order storage.Order) error
+	GetOrderByNumber(ctx context.Context, orderNumber string) (storage.Order, error)
+	GetOrdersToUpdateStatus(ctx context.Context, maxCount int) ([]storage.Order, error)
 }
 
 // Constructor of gofermart service object
@@ -48,9 +53,13 @@ func NewGofermart(s Storager, l Loggerer, loginRules, passRules, OrderNumberRule
 	validPassword := regexp.MustCompile(`^` + passRules + `+$`)
 	validOrderNumber := regexp.MustCompile(`^` + OrderNumberRules + `+$`)
 
+	orderProvider := newOrderProvider()
+
 	return &Gofermart{
 		storager: s,
 		loggerer: l,
+
+		orderProvider: orderProvider,
 
 		validLogin:    validLogin,
 		validPassword: validPassword,
@@ -58,4 +67,10 @@ func NewGofermart(s Storager, l Loggerer, loginRules, passRules, OrderNumberRule
 		tokenTTL:      tokenTTL,
 		secretKey:     defaultSecretKey,
 	}
+}
+
+//	Start service workers and other tasks
+func (g *Gofermart) Run(ctx context.Context) {
+
+	g.orderProvider.Run(ctx)
 }

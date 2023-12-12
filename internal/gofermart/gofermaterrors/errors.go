@@ -9,5 +9,8 @@ var (
 	PasswordShort        = errors.New("the password is too short, make up a password of 8 characters or more")
 	PasswordBad          = errors.New("the password can only be made of characters: 0-9, a-z, A-Z")
 	InvalidLoginPassword = errors.New("invalid login or password")
+
 	InvalidOrderNumber = errors.New("invalid order number")
+	DublicateOrderNumberByUser = errors.New("the order number has already been uploaded by this user")
+	DublicateOrderNumber = errors.New("the order number has already been uploaded by another user")
 )

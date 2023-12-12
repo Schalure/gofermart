@@ -24,3 +24,8 @@ func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.Use
 	panic("no implemented: func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.User, error)")
 
 }
+
+func (s *Storage) AddNewOrder(ctx context.Context, order storage.Order) error {
+
+	panic("no implemented: func (s *Storage) AddNewOrder(ctx context.Context, order storage.Order) error")
+}

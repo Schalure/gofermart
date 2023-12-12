@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/Schalure/gofermart/internal/configs"
@@ -13,6 +14,9 @@ import (
 func main() {
 
 	log.Println("Starting application initialization...")
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	log.Println("Config initializing...")
 	config, err := configs.NewConfig()
@@ -35,6 +39,7 @@ func main() {
 		config.AppConfig.OrderNumberRules, 
 		config.AppConfig.TokenTTL,
 	)
+	service.Run(ctx)
 
 	log.Println("HTTP server initializing...")
 	handler := server.NewHandler(service)
