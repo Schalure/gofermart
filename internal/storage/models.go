@@ -31,7 +31,7 @@ const (
 type Order struct {
 	OrderNumber string `json:"number" db:"order_number"`
 	OrderStatus OrderStatus `json:"status" db:"order_status"`
-	BonusPoints string `json:"accural" db:"bonus_points"`
+	BonusPoints int `json:"accural" db:"bonus_points"`
 	UploadedAt time.Time `json:"uploaded_at" db:"uploaded_at"`
 	UserLogin string `json:"login" db:"user_login"`
 }

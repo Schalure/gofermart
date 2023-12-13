@@ -16,7 +16,7 @@ const (
 )
 
 type OrderStatusChecker interface {
-	OrderStatusCheck(ctx context.Context, orderNumber string) (storage.Order, error)
+	OrderStatusCheck(ctx context.Context, orderNumber string, chan<- storage.Order)
 }
 
 //	Order provider object struct
@@ -26,7 +26,7 @@ type OrderProvider struct {
 }
 
 //	Constructor of OrderProvider
-func newOrderProvider(statusChecker OrderStatusChecker) *OrderProvider {
+func newOrderProvider(statusChecker OrderStatusChecker) *OrderProvider { 
 
 	return &OrderProvider{
 		orderCash: make(map[string]storage.Order, orderProviderCashSize),

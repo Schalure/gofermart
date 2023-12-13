@@ -19,7 +19,7 @@ type Gofermart struct {
 	storager Storager
 	loggerer Loggerer
 
-	orderProvider *OrderProvider
+	orderChecker OrderChecker
 
 	validPassword *regexp.Regexp
 	validLogin    *regexp.Regexp
@@ -28,6 +28,13 @@ type Gofermart struct {
 	secretKey     string
 }
 
+
+//go:generate mockgen -destination=../mocks/mock_orderchecker.go -package=mocks github.com/Schalure/gofermart/internal/gofermart OrderChecker
+type OrderChecker interface {
+	OrderCheck(ctx context.Context, orderNumber string) (storage.Order, error)
+}
+
+
 //go:generate mockgen -destination=../mocks/mock_loggerer.go -package=mocks github.com/Schalure/gofermart/internal/gofermart Loggerer
 type Loggerer interface {
 	Info(args ...interface{})
@@ -35,8 +42,7 @@ type Loggerer interface {
 	Debugw(msg string, keysAndValues ...interface{})
 }
 
-// Interface of work with the repository
-//
+
 //go:generate mockgen -destination=../mocks/mock_storager.go -package=mocks github.com/Schalure/gofermart/internal/gofermart Storager
 type Storager interface {
 	AddNewUser(ctx context.Context, user storage.User) error
@@ -47,19 +53,17 @@ type Storager interface {
 }
 
 // Constructor of gofermart service object
-func NewGofermart(s Storager, l Loggerer, loginRules, passRules, OrderNumberRules string, tokenTTL time.Duration) *Gofermart {
+func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules, passRules, OrderNumberRules string, tokenTTL time.Duration) *Gofermart {
 
 	validLogin := regexp.MustCompile(`^` + loginRules + `+$`)
 	validPassword := regexp.MustCompile(`^` + passRules + `+$`)
 	validOrderNumber := regexp.MustCompile(`^` + OrderNumberRules + `+$`)
 
-	orderProvider := newOrderProvider()
-
 	return &Gofermart{
 		storager: s,
 		loggerer: l,
 
-		orderProvider: orderProvider,
+		orderChecker: orderChecker,
 
 		validLogin:    validLogin,
 		validPassword: validPassword,
