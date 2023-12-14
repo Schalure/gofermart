@@ -62,7 +62,7 @@ func (g *Gofermart) LoadOrder(login, orderNumber string) error {
 		return gofermaterrors.Internal
 	}
 
-	err = g.orderProvider.addOrderToCash(order)
+	err = g.addOrderToCash(order)
 	if err != nil {
 		g.loggerer.Debugw(
 			pc,
@@ -74,24 +74,24 @@ func (g *Gofermart) LoadOrder(login, orderNumber string) error {
 
 func (g *Gofermart) checkOrderStatusWorker(ctx context.Context) {
 
-	jobsCh := make(chan storage.Order)
-	resultCh := make(chan storage.Order)
+	// jobsCh := make(chan storage.Order)
+	// resultCh := make(chan storage.Order)
 
-	for {
-		if freeCels, ok := g.orderProvider.isCashNotFull(); ok {
-			ctx, cancel := context.WithTimeout(ctx, time.Second * 5)
-			orders, err :=  g.storager.GetOrdersToUpdateStatus(ctx, freeCels)
-			cancel()
-			if err != nil {
-				break
-			}
-			for _, order := range orders {
-				if err := g.orderProvider.addOrderToCash(order); err != nil {
-					break
-				}
-			}
-		}
-	}
+	// for {
+	// 	if freeCels, ok := g.orderProvider.isCashNotFull(); ok {
+	// 		ctx, cancel := context.WithTimeout(ctx, time.Second * 5)
+	// 		orders, err :=  g.storager.GetOrdersToUpdateStatus(ctx, freeCels)
+	// 		cancel()
+	// 		if err != nil {
+	// 			break
+	// 		}
+	// 		for _, order := range orders {
+	// 			if err := g.orderProvider.addOrderToCash(order); err != nil {
+	// 				break
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 func (g *Gofermart) GetOrders(login string) ([]storage.Order, error) {

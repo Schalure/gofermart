@@ -20,6 +20,7 @@ type Gofermart struct {
 	loggerer Loggerer
 
 	orderChecker OrderChecker
+	orderCash map[string]storage.Order
 
 	validPassword *regexp.Regexp
 	validLogin    *regexp.Regexp
@@ -31,7 +32,7 @@ type Gofermart struct {
 
 //go:generate mockgen -destination=../mocks/mock_orderchecker.go -package=mocks github.com/Schalure/gofermart/internal/gofermart OrderChecker
 type OrderChecker interface {
-	OrderCheck(ctx context.Context, orderNumber string) (storage.Order, error)
+	OrderCheck(ctx context.Context, order storage.Order, resultCh chan<- struct{order storage.Order; statusCode int})
 }
 
 
@@ -64,6 +65,7 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 		loggerer: l,
 
 		orderChecker: orderChecker,
+		orderCash: make(map[string]storage.Order, ordersCashSize),
 
 		validLogin:    validLogin,
 		validPassword: validPassword,
@@ -76,5 +78,5 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 //	Start service workers and other tasks
 func (g *Gofermart) Run(ctx context.Context) {
 
-	g.orderProvider.Run(ctx)
+	//g.orderProvider.Run(ctx)
 }

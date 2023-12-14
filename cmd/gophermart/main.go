@@ -7,6 +7,7 @@ import (
 	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/gofermart"
 	"github.com/Schalure/gofermart/internal/loggers"
+	"github.com/Schalure/gofermart/internal/loyaltysystem"
 	"github.com/Schalure/gofermart/internal/server"
 	"github.com/Schalure/gofermart/internal/storage/postgrestor"
 )
@@ -31,9 +32,11 @@ func main() {
 	storage := postgrestor.NewStorage()
 
 	log.Println("Service initializing...")
+	orderChecker := loyaltysystem.NewLoyaltySystem(config.EnvConfig.AccrualHost)
 	service := gofermart.NewGofermart(
 		storage, 
 		logger, 
+		orderChecker,
 		config.AppConfig.LoginRules, 
 		config.AppConfig.PassRules, 
 		config.AppConfig.OrderNumberRules, 
