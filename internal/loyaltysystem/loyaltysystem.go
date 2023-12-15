@@ -38,7 +38,7 @@ func NewLoyaltySystem(host string) *LoyaltySystem {
 	}
 }
 
-func (s *LoyaltySystem) OrderCheck(ctx context.Context, order storage.Order, resultCh chan<- struct{order storage.Order; statusCode int}) {
+func (s *LoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) (storage.Order, int) {
 
 	type result struct {
 		Order   string      `json:"order"`
@@ -50,25 +50,17 @@ func (s *LoyaltySystem) OrderCheck(ctx context.Context, order storage.Order, res
 	resp, err := s.client.R().
 		SetContext(ctx).
 		SetResult(&res).
-		SetPathParams(map[string]string{"number": "1234567897"}).
+		SetPathParams(map[string]string{"number": ordernumber}).
 		Get(s.queryString)
 
 	if err != nil {
-		return
+		return storage.Order{}, 0
 	}
 
-	resultCh <- struct{
-		order storage.Order
-		statusCode int
-	}{
-		order: storage.Order{
-			OrderNumber: res.Order,
-			OrderStatus: storage.OrderStatus(res.Status),
-			BonusPoints: res.Accrual,
-			UserLogin: order.UserLogin,
-			UploadedAt: order.UploadedAt,
-		},
-		statusCode: resp.StatusCode(),
-	}
+	return storage.Order{
+		OrderNumber: res.Order,
+		OrderStatus: storage.OrderStatus(res.Status),
+		BonusPoints: res.Accrual,
+	}, resp.StatusCode()
 }
 
