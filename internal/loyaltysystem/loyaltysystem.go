@@ -43,7 +43,7 @@ func (s *LoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) (sto
 	type result struct {
 		Order   string      `json:"order"`
 		Status  OrderStatus `json:"status"`
-		Accrual int         `json:"accrual"`
+		Accrual float64         `json:"accrual"`
 	}
 	var res result
 

@@ -51,7 +51,7 @@ func (mr *MockLoyaltySystemManagerMockRecorder) GetWithdraws(arg0, arg1 interfac
 }
 
 // Withdraw mocks base method.
-func (m *MockLoyaltySystemManager) Withdraw(arg0 context.Context, arg1, arg2 string, arg3 int) error {
+func (m *MockLoyaltySystemManager) Withdraw(arg0 context.Context, arg1, arg2 string, arg3 float64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Withdraw", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(error)

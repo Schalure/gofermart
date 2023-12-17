@@ -53,7 +53,7 @@ type Storager interface {
 	GetOrderByNumber(ctx context.Context, orderNumber string) (storage.Order, error)
 	GetOrdersByLogin(ctx context.Context, login string) ([]storage.Order, error)
 	GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error)
-	WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum int) error
+	WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64) error
 	GetPointWithdraws(ctx context.Context, login string) ([]storage.Order, error)
 }
 

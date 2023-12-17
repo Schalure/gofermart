@@ -53,7 +53,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r* http.Request) {
 	type orderInfo struct {
 		Number string `json:"number"`
 		Status string `json:"status"`
-		Accrual int `json:"accrual"`
+		Accrual float64 `json:"accrual"`
 		UploadedAt time.Time `json:"uploaded_at"`
 	}
 

@@ -139,7 +139,7 @@ func (mr *MockStoragerMockRecorder) GetUserByLogin(arg0, arg1 interface{}) *gomo
 }
 
 // WithdrawPointsForOrder mocks base method.
-func (m *MockStorager) WithdrawPointsForOrder(arg0 context.Context, arg1 string, arg2 int) error {
+func (m *MockStorager) WithdrawPointsForOrder(arg0 context.Context, arg1 string, arg2 float64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WithdrawPointsForOrder", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)

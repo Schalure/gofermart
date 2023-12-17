@@ -8,7 +8,8 @@ import (
 type User struct {
 	Login    string `json:"login" db:"login"`
 	Password string `json:"password" db:"password"`
-	LoyaltyPoints int `json:"loyalty_points" db:"loyalty_points"`
+	LoyaltyPoints float64 `json:"loyalty_points" db:"loyalty_points"`
+	WithdrawnPoints float64 `json:"withdrawn_points" db:"withdrawn_points"`
 }
 
 func (u User) String() string {
@@ -32,7 +33,7 @@ const (
 type Order struct {
 	OrderNumber string `json:"number" db:"order_number"`
 	OrderStatus OrderStatus `json:"status" db:"order_status"`
-	BonusPoints int `json:"accural" db:"bonus_points"`
+	BonusPoints float64 `json:"accural" db:"bonus_points"`
 	UploadedAt time.Time `json:"uploaded_at" db:"uploaded_at"`
 	UserLogin string `json:"login" db:"user_login"`
 }

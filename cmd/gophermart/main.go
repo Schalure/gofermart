@@ -29,7 +29,10 @@ func main() {
 	logger := loggers.NewLogger(config.AppConfig.Env)
 
 	log.Println("Storage initializing...")
-	storage := postgrestor.NewStorage()
+	storage, err := postgrestor.NewStorage(config.EnvConfig.DBHost)
+	if err != nil {
+		log.Panicln("Storage have been initialized with error:", err)
+	}
 
 	log.Println("Service initializing...")
 	orderChecker := loyaltysystem.NewLoyaltySystem(config.EnvConfig.AccrualHost)

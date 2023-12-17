@@ -55,7 +55,7 @@ func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order,
 }
 
 
-func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum int) error {
+func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64) error {
 
 	panic("no implemented: func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum int) error")
 

@@ -27,7 +27,7 @@ type OrderManager interface {
 
 //go:generate mockgen -destination=../mocks/mock_loyaltysystemmanager.go -package=mocks github.com/Schalure/gofermart/internal/server LoyaltySystemManager
 type LoyaltySystemManager interface {
-	Withdraw(ctx context.Context, login, orderNumber string, sum int) error
+	Withdraw(ctx context.Context, login, orderNumber string, sum float64) error
 	GetWithdraws(ctx context.Context, login string) ([]storage.Order, error)
 }
 

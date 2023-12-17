@@ -8,7 +8,7 @@ import (
 	"github.com/Schalure/gofermart/internal/storage"
 )
 
-func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum int) error {
+func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum float64) error {
 
 	pc := "func (g *Gofermart) Withdraw(login, order string, sum int) error"
 
