@@ -16,7 +16,8 @@ func Test_isOrderValid(t *testing.T) {
 
 	stor := mocks.NewMockStorager(mockController)
 	logger := mocks.NewMockLoggerer(mockController)
-	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
+	orderChecker := mocks.NewMockOrderChecker(mockController)
+	service := NewGofermart(stor, logger, orderChecker, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
 
 	testCases := []struct {
 		name string

@@ -8,6 +8,7 @@ import (
 type User struct {
 	Login    string `json:"login" db:"login"`
 	Password string `json:"password" db:"password"`
+	LoyaltyPoints int `json:"loyalty_points" db:"loyalty_points"`
 }
 
 func (u User) String() string {

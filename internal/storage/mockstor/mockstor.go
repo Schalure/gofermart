@@ -33,3 +33,35 @@ func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.Use
 	}
 	return user, err
 }
+
+func (s *Storage) AddNewOrder(ctx context.Context, order storage.Order) error {
+
+	panic("no implemented: func (s *Storage) AddNewOrder(ctx context.Context, order storage.Order) error")
+}
+
+func (s *Storage) GetOrderByNumber(ctx context.Context, orderNumber string) (storage.Order, error) {
+
+	panic("no implemented: func (s *Storage) GetOrderByNumber(ctx context.Context, orderNumber string) (storage.Order, error)")
+}
+
+func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage.Order, error) {
+
+	panic("no implemented: func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage.Order, error)")
+}
+
+func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error) {
+
+	panic("no implemented: func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context, maxCount int) ([]storage.Order, error)")
+}
+
+
+func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum int) error {
+
+	panic("no implemented: func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum int) error")
+
+}
+func (s *Storage) GetPointWithdraws(ctx context.Context, login string) ([]storage.Order, error) {
+
+	panic("no implemented: func (s *Storage) GetPointWithdraws(ctx context.Context, login string) ([]storage.Order, error)")
+
+}

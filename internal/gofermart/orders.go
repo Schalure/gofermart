@@ -10,7 +10,7 @@ import (
 	"github.com/Schalure/gofermart/internal/storage"
 )
 
-
+//	Add new order to system
 func (g *Gofermart) LoadOrder(login, orderNumber string) error {
 
 	pc := "func (g *Gofermart) LoadOrder(login, orderNumber string) error"
@@ -66,19 +66,24 @@ func (g *Gofermart) LoadOrder(login, orderNumber string) error {
 	return nil
 }
 
-func (g *Gofermart) checkOrderStatusWorker(ctx context.Context) error {
-
-	pc := "func (g *Gofermart) checkOrderStatusWorker(ctx context.Context)"
-
-
-}
-
-
-
+//	Return info about orders by user
 func (g *Gofermart) GetOrders(login string) ([]storage.Order, error) {
 
+	pc := "func (g *Gofermart) GetOrders(login string) ([]storage.Order, error)"
 
-	return nil, nil
+	ctx1, cancel1 := context.WithTimeout(context.Background(), time.Second * 5)
+	defer cancel1()
+	orders, err := g.storager.GetOrdersByLogin(ctx1, login)
+	if err != nil {
+		g.loggerer.Infow(
+			pc,
+			"message", "error reading user orders",
+			"user", login,
+			"error", err,
+		)
+		return nil, err
+	}
+	return orders, nil
 }
 
 //	Order number validity check

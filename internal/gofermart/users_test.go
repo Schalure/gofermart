@@ -9,8 +9,10 @@ import (
 	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/loggers"
+	"github.com/Schalure/gofermart/internal/mocks"
 	"github.com/Schalure/gofermart/internal/storage"
 	"github.com/Schalure/gofermart/internal/storage/mockstor"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -100,9 +102,12 @@ func Test_CreateUser(t *testing.T) {
 		},
 	}
 
+	mockController := gomock.NewController(t)
+	defer mockController.Finish()
+	orderChecker := mocks.NewMockOrderChecker(mockController)
 	logger := loggers.NewLogger(configs.Debug)
 	stor := mockstor.NewStorage()
-	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
+	service := NewGofermart(stor, logger, orderChecker, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -168,9 +173,12 @@ func Test_UserAuthentication(t *testing.T) {
 		},
 	}
 
+	mockController := gomock.NewController(t)
+	defer mockController.Finish()
 	logger := loggers.NewLogger(configs.Debug)
 	stor := mockstor.NewStorage()
-	service := NewGofermart(stor, logger, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
+	orderChecker := mocks.NewMockOrderChecker(mockController)
+	service := NewGofermart(stor, logger, orderChecker, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {

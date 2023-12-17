@@ -2,21 +2,16 @@ package loyaltysystem
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/Schalure/gofermart/internal/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_OrderCheck(t *testing.T) {
-
-
-
 
 	testCases := []struct{
 		name string
@@ -28,7 +23,7 @@ func Test_OrderCheck(t *testing.T) {
 			order string
 			status OrderStatus
 			accrual int
-			err error
+			statusCode int
 		}
 	}{
 		{
@@ -37,11 +32,11 @@ func Test_OrderCheck(t *testing.T) {
 			responseBody: `{"order":"1234567897","status":"PROCESSED","accrual":500}`,
 			responseCode: http.StatusOK,
 			responseDelay: time.Second * 0,
-			want: struct{order string; status OrderStatus; accrual int; err error}{
+			want: struct{order string; status OrderStatus; accrual int; statusCode int}{
 				order: "1234567897",
 				status: Processed,
 				accrual: 500,
-				err: nil,
+				statusCode: http.StatusOK,
 			},
 		},
 		{
@@ -50,16 +45,11 @@ func Test_OrderCheck(t *testing.T) {
 			responseBody: `{"order":"1234567897","status":"PROCESSED","accrual":500}`,
 			responseCode: http.StatusOK,
 			responseDelay: time.Second * 2,
-			want: struct{order string; status OrderStatus; accrual int; err error}{
-				order: "1234567897",
-				status: Processed,
-				accrual: 500,
-				err: fmt.Errorf("the response timeout time has been exceeded"),
+			want: struct{order string; status OrderStatus; accrual int; statusCode int}{
+				statusCode: 0,
 			},
 		},
 	}
-
-
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -73,26 +63,17 @@ func Test_OrderCheck(t *testing.T) {
 			defer testServer.Close()
 			loyaltySystem := NewLoyaltySystem(testServer.URL)
 
-			resultCh := make(chan struct{order storage.Order; statusCode int})
-			var err error
+
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second * 1)
-
-			go loyaltySystem.OrderCheck(ctx, storage.Order{OrderNumber: test.requestOrder}, resultCh)
-
-			select {
-			case <-ctx.Done():
-				cancel()
-				err = fmt.Errorf("the response timeout time has been exceeded")
-			case order := <-resultCh:
-				assert.Equal(t, test.want.order, order.order.OrderNumber)
-				assert.Equal(t, string(test.want.status), string(order.order.OrderStatus))
-				assert.Equal(t, test.want.accrual, order.order.BonusPoints)
-				assert.Equal(t, test.responseCode, order.statusCode)
-			}
-			close(resultCh)
+			order, statusCode := loyaltySystem.OrderCheck(ctx, test.requestOrder)
 			cancel()
 
-			require.Equal(t, test.want.err, err)
+			require.Equal(t, test.want.statusCode, statusCode)
+
+			assert.Equal(t, test.want.order, order.OrderNumber)
+			assert.Equal(t, string(test.want.status), string(order.OrderStatus))
+			assert.Equal(t, test.want.accrual, order.BonusPoints)
+
 		})
 	}
 }

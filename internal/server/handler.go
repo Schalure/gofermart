@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+
+	"github.com/Schalure/gofermart/internal/storage"
 )
 
 const (
@@ -14,17 +16,45 @@ const (
 type UserManager interface {
 	CreateUser(ctx context.Context, login, password string) (string, error)
 	AuthenticationUser(ctx context.Context, login, password string) (string, error)
+	GetUserInfo(ctx context.Context, login string) (storage.User, error)
+}
+
+//go:generate mockgen -destination=../mocks/mock_ordermanager.go -package=mocks github.com/Schalure/gofermart/internal/server OrderManager
+type OrderManager interface {
+	LoadOrder(login, orderNumber string) error
+	GetOrders(login string) ([]storage.Order, error)
+}
+
+//go:generate mockgen -destination=../mocks/mock_loyaltysystemmanager.go -package=mocks github.com/Schalure/gofermart/internal/server LoyaltySystemManager
+type LoyaltySystemManager interface {
+	Withdraw(ctx context.Context, login, orderNumber string, sum int) error
+	GetWithdraws(ctx context.Context, login string) ([]storage.Order, error)
 }
 
 // Main handler object struct
 type Handler struct {
 	userManager UserManager
+	orderManager OrderManager
+	loyaltySystemManager LoyaltySystemManager
 }
 
 // Constructor for Handler type
-func NewHandler(userManager UserManager) *Handler {
+func NewHandler(userManager UserManager, orderManager OrderManager, loyaltySystemManager LoyaltySystemManager) *Handler {
 
 	return &Handler{
 		userManager: userManager,
+		orderManager: orderManager,
+		loyaltySystemManager: loyaltySystemManager,
 	}
+}
+
+//	Get login from request context
+func (h *Handler) getLoginFromContext(ctx context.Context) string {
+
+	login := ctx.Value(contextLoginKey)
+	l, ok := login.(string)
+	if ! ok {
+		return ""
+	}
+	return l
 }

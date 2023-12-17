@@ -45,7 +45,7 @@ func main() {
 	service.Run(ctx)
 
 	log.Println("HTTP server initializing...")
-	handler := server.NewHandler(service)
+	handler := server.NewHandler(service, service, service)
 	midleware := server.NewMidleware(logger, service)
 	server := server.NewServer(handler, midleware)
 

@@ -20,9 +20,9 @@ type Gofermart struct {
 	loggerer Loggerer
 
 	orderChecker OrderChecker
-	pendingOrders map[string]storage.Order
-
-
+	workChannel chan string
+	doneCh chan struct{}
+	
 	validPassword *regexp.Regexp
 	validLogin    *regexp.Regexp
 	validOrderNumber *regexp.Regexp
@@ -51,7 +51,10 @@ type Storager interface {
 	GetUserByLogin(ctx context.Context, login string) (storage.User, error)
 	AddNewOrder(ctx context.Context, order storage.Order) error
 	GetOrderByNumber(ctx context.Context, orderNumber string) (storage.Order, error)
+	GetOrdersByLogin(ctx context.Context, login string) ([]storage.Order, error)
 	GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error)
+	WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum int) error
+	GetPointWithdraws(ctx context.Context, login string) ([]storage.Order, error)
 }
 
 // Constructor of gofermart service object
@@ -67,7 +70,6 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 
 		orderChecker: orderChecker,
 
-		
 		validLogin:    validLogin,
 		validPassword: validPassword,
 		validOrderNumber: validOrderNumber,
