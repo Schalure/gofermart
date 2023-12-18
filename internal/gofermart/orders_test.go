@@ -10,7 +10,7 @@ import (
 )
 
 func Test_isOrderValid(t *testing.T) {
-	
+
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
@@ -20,38 +20,38 @@ func Test_isOrderValid(t *testing.T) {
 	service := NewGofermart(stor, logger, orderChecker, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
 
 	testCases := []struct {
-		name string
+		name      string
 		inpString string
-		want bool
+		want      bool
 	}{
 		{
-			name: "simple even test",
+			name:      "simple even test",
 			inpString: "4561261212345467",
-			want: true,
+			want:      true,
 		},
 		{
-			name: "bad even test",
+			name:      "bad even test",
 			inpString: "4561261212345464",
-			want: false,
-		},		{
-			name: "simple odd test",
+			want:      false,
+		}, {
+			name:      "simple odd test",
 			inpString: "1234567897",
-			want: true,
+			want:      true,
 		},
 		{
-			name: "bad odd test",
+			name:      "bad odd test",
 			inpString: "1234547897",
-			want: false,
+			want:      false,
 		},
 		{
-			name: "empty seq test",
+			name:      "empty seq test",
 			inpString: "",
-			want: false,
+			want:      false,
 		},
 		{
-			name: "bad seq test",
+			name:      "bad seq test",
 			inpString: "4561261212%45467",
-			want: false,
+			want:      false,
 		},
 	}
 

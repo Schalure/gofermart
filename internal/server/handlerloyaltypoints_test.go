@@ -19,7 +19,7 @@ func Test_GetBalance(t *testing.T) {
 
 	testMethod := "GET"
 	testURL := "/api/user/balance"
-	
+
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
@@ -32,26 +32,29 @@ func Test_GetBalance(t *testing.T) {
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
-	
+
 	testCases := []struct {
-		name string
-		tokenCheckerLogin string
-		tokenCheckerError error
-		userManagerPoints float64
+		name                       string
+		tokenCheckerLogin          string
+		tokenCheckerError          error
+		userManagerPoints          float64
 		userManagerWithdrawnPoints float64
 
 		want struct {
-			data string
+			data       string
 			statusCode int
 		}
 	}{
 		{
-			name: "simple test",
-			tokenCheckerLogin: "Petya",
-			tokenCheckerError: nil,
-			userManagerPoints: 500.5,
+			name:                       "simple test",
+			tokenCheckerLogin:          "Petya",
+			tokenCheckerError:          nil,
+			userManagerPoints:          500.5,
 			userManagerWithdrawnPoints: 42,
-			want: struct{data string; statusCode int}{
+			want: struct {
+				data       string
+				statusCode int
+			}{
 				data: `
 				{
 					"current": 500.5, 
@@ -66,9 +69,9 @@ func Test_GetBalance(t *testing.T) {
 
 			tokenCheker.EXPECT().CheckValidJWT("qqqq").Return(test.tokenCheckerLogin, test.tokenCheckerError)
 			userManager.EXPECT().GetUserInfo(gomock.Any(), test.tokenCheckerLogin).Return(storage.User{
-				LoyaltyPoints: test.userManagerPoints, 
+				LoyaltyPoints:   test.userManagerPoints,
 				WithdrawnPoints: 42,
-				}, nil)
+			}, nil)
 
 			req, err := http.NewRequest(testMethod, testServer.URL+testURL, nil)
 			req.AddCookie(&http.Cookie{Name: authorizationCookie, Value: "qqqq"})
@@ -78,7 +81,6 @@ func Test_GetBalance(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, test.want.statusCode, resp.StatusCode)
-			
 
 			var buf bytes.Buffer
 			_, err = buf.ReadFrom(resp.Body)
@@ -89,10 +91,10 @@ func Test_GetBalance(t *testing.T) {
 }
 
 func Test_WithdrawLoyaltyPoints(t *testing.T) {
-	
+
 	testMethod := "POST"
 	testURL := "/api/user/balance/withdraw"
-	
+
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
@@ -105,15 +107,15 @@ func Test_WithdrawLoyaltyPoints(t *testing.T) {
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
-	
+
 	testCases := []struct {
-		name string
-		requestBody string
-		tokenCheckerLogin string
-		tokenCheckerError error
+		name                      string
+		requestBody               string
+		tokenCheckerLogin         string
+		tokenCheckerError         error
 		loyaltySystemManagerLogin string
 		loyaltySystemManagerOrder string
-		loyaltySystemManagerSum float64
+		loyaltySystemManagerSum   float64
 
 		want struct {
 			statusCode int
@@ -126,12 +128,12 @@ func Test_WithdrawLoyaltyPoints(t *testing.T) {
 				"order": "2377225624",
 				"sum": 751
 			}`,
-			tokenCheckerLogin: "Petya",
-			tokenCheckerError: nil,
+			tokenCheckerLogin:         "Petya",
+			tokenCheckerError:         nil,
 			loyaltySystemManagerLogin: "Petya",
 			loyaltySystemManagerOrder: "2377225624",
-			loyaltySystemManagerSum: 751,
-			want: struct{statusCode int}{
+			loyaltySystemManagerSum:   751,
+			want: struct{ statusCode int }{
 				statusCode: http.StatusOK,
 			},
 		},
@@ -150,7 +152,7 @@ func Test_WithdrawLoyaltyPoints(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, test.want.statusCode, resp.StatusCode)
-			
+
 		})
 	}
 }
@@ -159,7 +161,7 @@ func Test_GetOrdersWithdrawals(t *testing.T) {
 
 	testMethod := "GET"
 	testURL := "/api/user/withdrawals"
-	
+
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
@@ -172,31 +174,34 @@ func Test_GetOrdersWithdrawals(t *testing.T) {
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
-	
+
 	testCases := []struct {
-		name string
-		tokenCheckerLogin string
-		tokenCheckerError error
-		loyaltySystemManagerLogin string
+		name                       string
+		tokenCheckerLogin          string
+		tokenCheckerError          error
+		loyaltySystemManagerLogin  string
 		loyaltySystemManagerOrders []storage.Order
-		want struct {
+		want                       struct {
 			statusCode int
-			data string
+			data       string
 		}
 	}{
 		{
-			name: "simple test",
-			tokenCheckerLogin: "Petya",
-			tokenCheckerError: nil,
+			name:                      "simple test",
+			tokenCheckerLogin:         "Petya",
+			tokenCheckerError:         nil,
 			loyaltySystemManagerLogin: "Petya",
 			loyaltySystemManagerOrders: []storage.Order{
 				{
 					OrderNumber: "2377225624",
 					BonusPoints: 500,
-					UploadedAt: time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
+					UploadedAt:  time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
 				},
 			},
-			want: struct{statusCode int; data string}{
+			want: struct {
+				statusCode int
+				data       string
+			}{
 				statusCode: http.StatusOK,
 				data: `  
 				[
@@ -226,7 +231,7 @@ func Test_GetOrdersWithdrawals(t *testing.T) {
 			var buf bytes.Buffer
 			_, err = buf.ReadFrom(resp.Body)
 			require.NoError(t, err)
-			assert.JSONEq(t, test.want.data, buf.String())			
+			assert.JSONEq(t, test.want.data, buf.String())
 		})
-	}	
+	}
 }

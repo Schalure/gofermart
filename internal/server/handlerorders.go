@@ -12,13 +12,13 @@ import (
 )
 
 //	Order registr handler. POST /api/user/orders
-func (h *Handler) LoadOrder(w http.ResponseWriter, r* http.Request) {
+func (h *Handler) LoadOrder(w http.ResponseWriter, r *http.Request) {
 
 	login := h.getLoginFromContext(r.Context())
 	if login == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
-	}	
+	}
 
 	//	get url
 	orderNumber, err := io.ReadAll(r.Body)
@@ -48,12 +48,12 @@ func (h *Handler) LoadOrder(w http.ResponseWriter, r* http.Request) {
 }
 
 //	Get orders for user handler. GET /api/user/orders
-func (h *Handler) GetOrders(w http.ResponseWriter, r* http.Request) {
+func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 
 	type orderInfo struct {
-		Number string `json:"number"`
-		Status string `json:"status"`
-		Accrual float64 `json:"accrual,omitempty"`
+		Number     string    `json:"number"`
+		Status     string    `json:"status"`
+		Accrual    float64   `json:"accrual,omitempty"`
 		UploadedAt time.Time `json:"uploaded_at"`
 	}
 
@@ -65,7 +65,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r* http.Request) {
 
 	orders, err := h.orderManager.GetOrders(r.Context(), login)
 	if err != nil {
-		if errors.Is(err, gofermaterrors.NoData){
+		if errors.Is(err, gofermaterrors.NoData) {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
@@ -75,9 +75,9 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r* http.Request) {
 	ordersInfo := make([]orderInfo, len(orders))
 	for i, order := range orders {
 		ordersInfo[i] = orderInfo{
-			Number: order.OrderNumber,
-			Status: string(order.OrderStatus),
-			Accrual: order.BonusPoints,
+			Number:     order.OrderNumber,
+			Status:     string(order.OrderStatus),
+			Accrual:    order.BonusPoints,
 			UploadedAt: order.UploadedAt,
 		}
 	}

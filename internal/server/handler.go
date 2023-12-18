@@ -33,8 +33,8 @@ type LoyaltySystemManager interface {
 
 // Main handler object struct
 type Handler struct {
-	userManager UserManager
-	orderManager OrderManager
+	userManager          UserManager
+	orderManager         OrderManager
 	loyaltySystemManager LoyaltySystemManager
 }
 
@@ -42,8 +42,8 @@ type Handler struct {
 func NewHandler(userManager UserManager, orderManager OrderManager, loyaltySystemManager LoyaltySystemManager) *Handler {
 
 	return &Handler{
-		userManager: userManager,
-		orderManager: orderManager,
+		userManager:          userManager,
+		orderManager:         orderManager,
 		loyaltySystemManager: loyaltySystemManager,
 	}
 }
@@ -53,7 +53,7 @@ func (h *Handler) getLoginFromContext(ctx context.Context) string {
 
 	login := ctx.Value(contextLoginKey)
 	l, ok := login.(string)
-	if ! ok {
+	if !ok {
 		return ""
 	}
 	return l

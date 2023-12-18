@@ -24,7 +24,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 		return gofermaterrors.InvalidOrderNumber
 	}
 
-	ctx1, cancel1 := context.WithTimeout(ctx, time.Second * 5)
+	ctx1, cancel1 := context.WithTimeout(ctx, time.Second*5)
 	defer cancel1()
 	order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)
 	if err == nil {
@@ -44,12 +44,12 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 
 	order = storage.Order{
 		OrderNumber: orderNumber,
-		UserLogin: login,
+		UserLogin:   login,
 		OrderStatus: storage.OrderStatusNew,
-		UploadedAt: time.Now(),
+		UploadedAt:  time.Now(),
 	}
 
-	ctx2, cancel2 := context.WithTimeout(ctx, time.Second * 5)
+	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)
 	defer cancel2()
 	err = g.storager.AddNewOrder(ctx2, order)
 	if err != nil {
@@ -71,7 +71,7 @@ func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Orde
 
 	pc := "func (g *Gofermart) GetOrders(login string) ([]storage.Order, error)"
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second * 5)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
 	orders, err := g.storager.GetOrdersByLogin(ctx, login)
 	if err != nil {
@@ -92,7 +92,7 @@ func (g *Gofermart) isOrderValid(orderNumber string) bool {
 	if !g.validOrderNumber.MatchString(orderNumber) {
 		return false
 	}
-	
+
 	orderNumberStringArr := strings.Split(orderNumber, "")
 	if len(orderNumberStringArr) < 2 {
 		return false
@@ -114,13 +114,13 @@ func LunaAlgorithm(data []int) bool {
 	startNum := dataLenght % 2
 	res := 0
 
-	for ; startNum < dataLenght - 1; startNum += 2 {
+	for ; startNum < dataLenght-1; startNum += 2 {
 		data[startNum] *= 2
 		if data[startNum] >= k {
 			data[startNum] -= k
 		}
-		res += data[startNum] + data[startNum + 1]
+		res += data[startNum] + data[startNum+1]
 	}
 
-	return res % 10 == 0
+	return res%10 == 0
 }

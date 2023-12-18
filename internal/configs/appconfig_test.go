@@ -21,11 +21,11 @@ func Test_createAppConfigFile(t *testing.T) {
 		{
 			name: "simple test",
 			appConfig: AppConfig{
-				Env:        Debug,
+				Env:              Debug,
 				OrderNumberRules: defaultOrderNumberRules,
-				LoginRules: defaultLoginRules,
-				PassRules:  defaultPassRules,
-				TokenTTL:   defaultTokenTTL,
+				LoginRules:       defaultLoginRules,
+				PassRules:        defaultPassRules,
+				TokenTTL:         defaultTokenTTL,
 			},
 			want: struct{ data string }{
 				data: "Environment: debug\nLoginRules: '[0-9a-zA-Z@._]'\nPasswordRules: '[0-9a-zA-Z]'\nOrderNumberRules: '[0-9]'\nTokenTimeToLife: 1h0m0s\n",
@@ -64,11 +64,11 @@ func Test_getAppConfigFromFile(t *testing.T) {
 			data: "Environment: 'prod'\nLoginRules: '[0-9a-zA-Z@._]'\nPasswordRules: '[0-9a-zA-Z]'\nOrderNumberRules: '[0-9]'\nTokenTimeToLife: 2h30m10s\n",
 			want: struct{ appConfig AppConfig }{
 				appConfig: AppConfig{
-					Env:        Prod,
-					LoginRules: defaultLoginRules,
-					PassRules:  defaultPassRules,
+					Env:              Prod,
+					LoginRules:       defaultLoginRules,
+					PassRules:        defaultPassRules,
 					OrderNumberRules: defaultOrderNumberRules,
-					TokenTTL:   time.Hour*2 + time.Minute*30 + time.Second*10,
+					TokenTTL:         time.Hour*2 + time.Minute*30 + time.Second*10,
 				},
 			},
 		},

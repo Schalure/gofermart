@@ -15,15 +15,12 @@ type Storage struct {
 
 func NewStorage(dbConnectionString string) (*Storage, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	db, err := pgxpool.New(ctx, dbConnectionString)
 	if err != nil {
 		return nil, err
 	}
-
-
-
 
 	return &Storage{}, nil
 }
@@ -58,7 +55,6 @@ func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order,
 
 	panic("no implemented: func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context, maxCount int) ([]storage.Order, error)")
 }
-
 
 func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64) error {
 

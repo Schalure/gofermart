@@ -20,22 +20,20 @@ type Gofermart struct {
 	loggerer Loggerer
 
 	orderChecker OrderChecker
-	workChannel chan string
-	doneCh chan struct{}
-	
-	validPassword *regexp.Regexp
-	validLogin    *regexp.Regexp
-	validOrderNumber *regexp.Regexp
-	tokenTTL      time.Duration
-	secretKey     string
-}
+	workChannel  chan string
+	doneCh       chan struct{}
 
+	validPassword    *regexp.Regexp
+	validLogin       *regexp.Regexp
+	validOrderNumber *regexp.Regexp
+	tokenTTL         time.Duration
+	secretKey        string
+}
 
 //go:generate mockgen -destination=../mocks/mock_orderchecker.go -package=mocks github.com/Schalure/gofermart/internal/gofermart OrderChecker
 type OrderChecker interface {
 	OrderCheck(ctx context.Context, ordernumber string) (storage.Order, int)
 }
-
 
 //go:generate mockgen -destination=../mocks/mock_loggerer.go -package=mocks github.com/Schalure/gofermart/internal/gofermart Loggerer
 type Loggerer interface {
@@ -43,7 +41,6 @@ type Loggerer interface {
 	Infow(msg string, keysAndValues ...interface{})
 	Debugw(msg string, keysAndValues ...interface{})
 }
-
 
 //go:generate mockgen -destination=../mocks/mock_storager.go -package=mocks github.com/Schalure/gofermart/internal/gofermart Storager
 type Storager interface {
@@ -70,11 +67,11 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 
 		orderChecker: orderChecker,
 
-		validLogin:    validLogin,
-		validPassword: validPassword,
+		validLogin:       validLogin,
+		validPassword:    validPassword,
 		validOrderNumber: validOrderNumber,
-		tokenTTL:      tokenTTL,
-		secretKey:     defaultSecretKey,
+		tokenTTL:         tokenTTL,
+		secretKey:        defaultSecretKey,
 	}
 }
 

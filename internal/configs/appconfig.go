@@ -11,11 +11,11 @@ import (
 
 // Application configugation struct
 type AppConfig struct {
-	Env        Environment   `yaml:"Environment"`
-	LoginRules string        `yaml:"LoginRules"`
-	PassRules  string        `yaml:"PasswordRules"`
-	OrderNumberRules string `yaml:"OrderNumberRules"`
-	TokenTTL   time.Duration `yaml:"TokenTimeToLife"`
+	Env              Environment   `yaml:"Environment"`
+	LoginRules       string        `yaml:"LoginRules"`
+	PassRules        string        `yaml:"PasswordRules"`
+	OrderNumberRules string        `yaml:"OrderNumberRules"`
+	TokenTTL         time.Duration `yaml:"TokenTimeToLife"`
 }
 
 // Values for `yaml:"Environment"`
@@ -29,22 +29,22 @@ const (
 
 // Default application configugation values
 const (
-	defaultEnv        = Debug
-	defaultLoginRules = `[0-9a-zA-Z@._]`
-	defaultPassRules  = `[0-9a-zA-Z]`
+	defaultEnv              = Debug
+	defaultLoginRules       = `[0-9a-zA-Z@._]`
+	defaultPassRules        = `[0-9a-zA-Z]`
 	defaultOrderNumberRules = `[0-9]`
-	defaultTokenTTL   = time.Hour * 1
+	defaultTokenTTL         = time.Hour * 1
 )
 
 // Application configuration constructor
 func newAppConfig(fileName string) (*AppConfig, error) {
 
 	appConfig := AppConfig{
-		Env:        defaultEnv,
-		LoginRules: defaultLoginRules,
-		PassRules:  defaultPassRules,
+		Env:              defaultEnv,
+		LoginRules:       defaultLoginRules,
+		PassRules:        defaultPassRules,
 		OrderNumberRules: defaultOrderNumberRules,
-		TokenTTL:   defaultTokenTTL,
+		TokenTTL:         defaultTokenTTL,
 	}
 
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {

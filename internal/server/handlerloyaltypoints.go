@@ -11,10 +11,10 @@ import (
 )
 
 //	Get loyality points balance. GET /api/user/balance
-func (h *Handler) GetBalance(w http.ResponseWriter, r* http.Request) {
+func (h *Handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 
 	type Balance struct {
-		Current float64 `json:"current"`
+		Current   float64 `json:"current"`
 		Withdrawn float64 `json:"withdrawn"`
 	}
 
@@ -31,7 +31,7 @@ func (h *Handler) GetBalance(w http.ResponseWriter, r* http.Request) {
 	}
 
 	data, err := json.Marshal(Balance{
-		Current: user.LoyaltyPoints,
+		Current:   user.LoyaltyPoints,
 		Withdrawn: user.WithdrawnPoints,
 	})
 	if err != nil {
@@ -44,13 +44,11 @@ func (h *Handler) GetBalance(w http.ResponseWriter, r* http.Request) {
 	w.Write(data)
 }
 
+func (h *Handler) WithdrawLoyaltyPoints(w http.ResponseWriter, r *http.Request) {
 
-func (h *Handler) WithdrawLoyaltyPoints(w http.ResponseWriter, r* http.Request) {
-
-
-	type Order struct{
-		OrderNumber string `json:"order"`
-		Sum float64 `json:"sum"`
+	type Order struct {
+		OrderNumber string  `json:"order"`
+		Sum         float64 `json:"sum"`
 	}
 
 	login := h.getLoginFromContext(r.Context())
@@ -87,13 +85,12 @@ func (h *Handler) WithdrawLoyaltyPoints(w http.ResponseWriter, r* http.Request) 
 	w.WriteHeader(http.StatusOK)
 }
 
-
 //	Receiving information on withdrawal of funds. GET /api/user/withdrawals
-func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r* http.Request) {
+func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r *http.Request) {
 
 	type Withdrawal struct {
-		OrderNumber string `json:"order"`
-		Sum float64 `json:"sum"`
+		OrderNumber string    `json:"order"`
+		Sum         float64   `json:"sum"`
 		ProcessedAt time.Time `json:"processed_at"`
 	}
 
@@ -117,7 +114,7 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r* http.Request) {
 	for i, order := range orders {
 		withdrawals[i] = Withdrawal{
 			OrderNumber: order.OrderNumber,
-			Sum: order.BonusPoints,
+			Sum:         order.BonusPoints,
 			ProcessedAt: order.UploadedAt,
 		}
 	}
@@ -133,4 +130,3 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r* http.Request) {
 	w.Write(data)
 
 }
-

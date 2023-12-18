@@ -21,7 +21,7 @@ func Test_LoadOrder(t *testing.T) {
 
 	testMethod := "POST"
 	testURL := "/api/user/orders"
-	
+
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
@@ -36,64 +36,64 @@ func Test_LoadOrder(t *testing.T) {
 	defer testServer.Close()
 
 	testCases := []struct {
-		name string
-		requestOrder string
-		tokenChekerGomockCall *gomock.Call
+		name                   string
+		requestOrder           string
+		tokenChekerGomockCall  *gomock.Call
 		orderManagerGomockCall *gomock.Call
-		want struct {
+		want                   struct {
 			statusCode int
 		}
 	}{
 		{
-			name: "simple test",
-			requestOrder: "1234567897",
+			name:                   "simple test",
+			requestOrder:           "1234567897",
 			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(nil),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
-			want: struct{statusCode int}{
+			want: struct{ statusCode int }{
 				statusCode: http.StatusAccepted,
 			},
 		},
 		{
-			name: "invalid order test",
-			requestOrder: "123456789",
+			name:                   "invalid order test",
+			requestOrder:           "123456789",
 			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "123456789").Return(gofermaterrors.InvalidOrderNumber),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
-			want: struct{statusCode int}{
+			want: struct{ statusCode int }{
 				statusCode: http.StatusUnprocessableEntity,
 			},
 		},
 		{
-			name: "dublicate order number by user test",
-			requestOrder: "1234567897",
+			name:                   "dublicate order number by user test",
+			requestOrder:           "1234567897",
 			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.DublicateOrderNumberByUser),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
-			want: struct{statusCode int}{
+			want: struct{ statusCode int }{
 				statusCode: http.StatusOK,
 			},
 		},
 		{
-			name: "dublicate order number test",
-			requestOrder: "1234567897",
+			name:                   "dublicate order number test",
+			requestOrder:           "1234567897",
 			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.DublicateOrderNumber),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
-			want: struct{statusCode int}{
+			want: struct{ statusCode int }{
 				statusCode: http.StatusConflict,
 			},
 		},
 		{
-			name: "unauthorized test",
-			requestOrder: "1234567897",
-			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("", errors.New("")),
-			want: struct{statusCode int}{
+			name:                  "unauthorized test",
+			requestOrder:          "1234567897",
+			tokenChekerGomockCall: tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("", errors.New("")),
+			want: struct{ statusCode int }{
 				statusCode: http.StatusUnauthorized,
 			},
 		},
 		{
-			name: "other errors test",
-			requestOrder: "1234567897",
+			name:                   "other errors test",
+			requestOrder:           "1234567897",
 			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.Internal),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
-			want: struct{statusCode int}{
+			want: struct{ statusCode int }{
 				statusCode: http.StatusInternalServerError,
 			},
 		},
@@ -114,12 +114,11 @@ func Test_LoadOrder(t *testing.T) {
 	}
 }
 
-
 func Test_GetOrders(t *testing.T) {
 
 	testMethod := "GET"
 	testURL := "/api/user/orders"
-	
+
 	mockController := gomock.NewController(t)
 	defer mockController.Finish()
 
@@ -132,42 +131,45 @@ func Test_GetOrders(t *testing.T) {
 
 	testServer := httptest.NewServer(server.router)
 	defer testServer.Close()
-	
+
 	testCases := []struct {
-		name string
-		tokenCheckerLogin string
-		tokenCheckerError error
+		name               string
+		tokenCheckerLogin  string
+		tokenCheckerError  error
 		orderManagerOrders []storage.Order
-		orderManagerError error
-		want struct {
-			data string
+		orderManagerError  error
+		want               struct {
+			data       string
 			statusCode int
 		}
 	}{
 		{
-			name: "simple test",
+			name:              "simple test",
 			tokenCheckerLogin: "Petya",
 			tokenCheckerError: nil,
-				orderManagerOrders: []storage.Order{
+			orderManagerOrders: []storage.Order{
 				{
 					OrderNumber: "9278923470",
 					OrderStatus: "PROCESSED",
 					BonusPoints: 500,
-					UploadedAt: time.Date(2020, 12, 10, 15, 15, 45, 0, time.FixedZone("", 60*60*3)),
+					UploadedAt:  time.Date(2020, 12, 10, 15, 15, 45, 0, time.FixedZone("", 60*60*3)),
 				},
 				{
 					OrderNumber: "12345678903",
 					OrderStatus: "PROCESSING",
-					UploadedAt: time.Date(2020, 12, 10, 15, 12, 1, 0, time.FixedZone("", 60*60*3)),
+					UploadedAt:  time.Date(2020, 12, 10, 15, 12, 1, 0, time.FixedZone("", 60*60*3)),
 				},
 				{
 					OrderNumber: "346436439",
 					OrderStatus: "INVALID",
-					UploadedAt: time.Date(2020, 12, 9, 16, 9, 53, 0, time.FixedZone("", 60*60*3)),
+					UploadedAt:  time.Date(2020, 12, 9, 16, 9, 53, 0, time.FixedZone("", 60*60*3)),
 				},
 			},
 			orderManagerError: nil,
-			want: struct{data string; statusCode int}{
+			want: struct {
+				data       string
+				statusCode int
+			}{
 				data: `[
 					{
 						"number": "9278923470",
@@ -190,7 +192,6 @@ func Test_GetOrders(t *testing.T) {
 		},
 	}
 
-
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
 
@@ -205,7 +206,7 @@ func Test_GetOrders(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, test.want.statusCode, resp.StatusCode)
-			
+
 			var buf bytes.Buffer
 			_, err = buf.ReadFrom(resp.Body)
 			require.NoError(t, err)
@@ -214,4 +215,3 @@ func Test_GetOrders(t *testing.T) {
 		})
 	}
 }
-

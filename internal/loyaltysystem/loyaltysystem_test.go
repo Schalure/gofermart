@@ -13,39 +13,49 @@ import (
 
 func Test_OrderCheck(t *testing.T) {
 
-	testCases := []struct{
-		name string
-		requestOrder string
-		responseBody string
-		responseCode int
+	testCases := []struct {
+		name          string
+		requestOrder  string
+		responseBody  string
+		responseCode  int
 		responseDelay time.Duration
-		want struct{
-			order string
-			status OrderStatus
-			accrual float64
+		want          struct {
+			order      string
+			status     OrderStatus
+			accrual    float64
 			statusCode int
 		}
 	}{
 		{
-			name: "simple test",
-			requestOrder: "1234567897",
-			responseBody: `{"order":"1234567897","status":"PROCESSED","accrual":500}`,
-			responseCode: http.StatusOK,
+			name:          "simple test",
+			requestOrder:  "1234567897",
+			responseBody:  `{"order":"1234567897","status":"PROCESSED","accrual":500}`,
+			responseCode:  http.StatusOK,
 			responseDelay: time.Second * 0,
-			want: struct{order string; status OrderStatus; accrual float64; statusCode int}{
-				order: "1234567897",
-				status: Processed,
-				accrual: 500,
+			want: struct {
+				order      string
+				status     OrderStatus
+				accrual    float64
+				statusCode int
+			}{
+				order:      "1234567897",
+				status:     Processed,
+				accrual:    500,
 				statusCode: http.StatusOK,
 			},
 		},
 		{
-			name: "timeout test",
-			requestOrder: "1234567897",
-			responseBody: `{"order":"1234567897","status":"PROCESSED","accrual":500}`,
-			responseCode: http.StatusOK,
+			name:          "timeout test",
+			requestOrder:  "1234567897",
+			responseBody:  `{"order":"1234567897","status":"PROCESSED","accrual":500}`,
+			responseCode:  http.StatusOK,
 			responseDelay: time.Second * 2,
-			want: struct{order string; status OrderStatus; accrual float64; statusCode int}{
+			want: struct {
+				order      string
+				status     OrderStatus
+				accrual    float64
+				statusCode int
+			}{
 				statusCode: 0,
 			},
 		},
@@ -63,8 +73,7 @@ func Test_OrderCheck(t *testing.T) {
 			defer testServer.Close()
 			loyaltySystem := NewLoyaltySystem(testServer.URL)
 
-
-			ctx, cancel := context.WithTimeout(context.Background(), time.Second * 1)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second*1)
 			order, statusCode := loyaltySystem.OrderCheck(ctx, test.requestOrder)
 			cancel()
 
