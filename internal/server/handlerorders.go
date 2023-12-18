@@ -27,7 +27,7 @@ func (h *Handler) LoadOrder(w http.ResponseWriter, r* http.Request) {
 		return
 	}
 
-	if err = h.orderManager.LoadOrder(login, string(orderNumber)); err != nil {
+	if err = h.orderManager.LoadOrder(r.Context(), login, string(orderNumber)); err != nil {
 		if errors.Is(err, gofermaterrors.InvalidOrderNumber) {
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
@@ -53,7 +53,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r* http.Request) {
 	type orderInfo struct {
 		Number string `json:"number"`
 		Status string `json:"status"`
-		Accrual float64 `json:"accrual"`
+		Accrual float64 `json:"accrual,omitempty"`
 		UploadedAt time.Time `json:"uploaded_at"`
 	}
 
@@ -63,7 +63,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r* http.Request) {
 		return
 	}
 
-	orders, err := h.orderManager.GetOrders(login)
+	orders, err := h.orderManager.GetOrders(r.Context(), login)
 	if err != nil {
 		if errors.Is(err, gofermaterrors.NoData){
 			w.WriteHeader(http.StatusNoContent)

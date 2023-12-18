@@ -114,12 +114,12 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r* http.Request) {
 	}
 
 	withdrawals := make([]Withdrawal, len(orders))
-	for _, order := range orders {
-		withdrawals = append(withdrawals, Withdrawal{
+	for i, order := range orders {
+		withdrawals[i] = Withdrawal{
 			OrderNumber: order.OrderNumber,
 			Sum: order.BonusPoints,
 			ProcessedAt: order.UploadedAt,
-		})
+		}
 	}
 
 	data, err := json.Marshal(withdrawals)

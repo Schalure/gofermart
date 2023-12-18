@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	storage "github.com/Schalure/gofermart/internal/storage"
@@ -35,30 +36,30 @@ func (m *MockOrderManager) EXPECT() *MockOrderManagerMockRecorder {
 }
 
 // GetOrders mocks base method.
-func (m *MockOrderManager) GetOrders(arg0 string) ([]storage.Order, error) {
+func (m *MockOrderManager) GetOrders(arg0 context.Context, arg1 string) ([]storage.Order, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetOrders", arg0)
+	ret := m.ctrl.Call(m, "GetOrders", arg0, arg1)
 	ret0, _ := ret[0].([]storage.Order)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetOrders indicates an expected call of GetOrders.
-func (mr *MockOrderManagerMockRecorder) GetOrders(arg0 interface{}) *gomock.Call {
+func (mr *MockOrderManagerMockRecorder) GetOrders(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrders", reflect.TypeOf((*MockOrderManager)(nil).GetOrders), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrders", reflect.TypeOf((*MockOrderManager)(nil).GetOrders), arg0, arg1)
 }
 
 // LoadOrder mocks base method.
-func (m *MockOrderManager) LoadOrder(arg0, arg1 string) error {
+func (m *MockOrderManager) LoadOrder(arg0 context.Context, arg1, arg2 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoadOrder", arg0, arg1)
+	ret := m.ctrl.Call(m, "LoadOrder", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // LoadOrder indicates an expected call of LoadOrder.
-func (mr *MockOrderManagerMockRecorder) LoadOrder(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockOrderManagerMockRecorder) LoadOrder(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadOrder", reflect.TypeOf((*MockOrderManager)(nil).LoadOrder), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadOrder", reflect.TypeOf((*MockOrderManager)(nil).LoadOrder), arg0, arg1, arg2)
 }

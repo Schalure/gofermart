@@ -11,7 +11,7 @@ import (
 )
 
 //	Add new order to system
-func (g *Gofermart) LoadOrder(login, orderNumber string) error {
+func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) error {
 
 	pc := "func (g *Gofermart) LoadOrder(login, orderNumber string) error"
 
@@ -24,7 +24,7 @@ func (g *Gofermart) LoadOrder(login, orderNumber string) error {
 		return gofermaterrors.InvalidOrderNumber
 	}
 
-	ctx1, cancel1 := context.WithTimeout(context.Background(), time.Second * 5)
+	ctx1, cancel1 := context.WithTimeout(ctx, time.Second * 5)
 	defer cancel1()
 	order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)
 	if err == nil {
@@ -49,7 +49,7 @@ func (g *Gofermart) LoadOrder(login, orderNumber string) error {
 		UploadedAt: time.Now(),
 	}
 
-	ctx2, cancel2 := context.WithTimeout(context.Background(), time.Second * 5)
+	ctx2, cancel2 := context.WithTimeout(ctx, time.Second * 5)
 	defer cancel2()
 	err = g.storager.AddNewOrder(ctx2, order)
 	if err != nil {
@@ -67,13 +67,13 @@ func (g *Gofermart) LoadOrder(login, orderNumber string) error {
 }
 
 //	Return info about orders by user
-func (g *Gofermart) GetOrders(login string) ([]storage.Order, error) {
+func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Order, error) {
 
 	pc := "func (g *Gofermart) GetOrders(login string) ([]storage.Order, error)"
 
-	ctx1, cancel1 := context.WithTimeout(context.Background(), time.Second * 5)
-	defer cancel1()
-	orders, err := g.storager.GetOrdersByLogin(ctx1, login)
+	ctx, cancel := context.WithTimeout(ctx, time.Second * 5)
+	defer cancel()
+	orders, err := g.storager.GetOrdersByLogin(ctx, login)
 	if err != nil {
 		g.loggerer.Infow(
 			pc,

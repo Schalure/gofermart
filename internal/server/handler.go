@@ -21,8 +21,8 @@ type UserManager interface {
 
 //go:generate mockgen -destination=../mocks/mock_ordermanager.go -package=mocks github.com/Schalure/gofermart/internal/server OrderManager
 type OrderManager interface {
-	LoadOrder(login, orderNumber string) error
-	GetOrders(login string) ([]storage.Order, error)
+	LoadOrder(ctx context.Context, login, orderNumber string) error
+	GetOrders(ctx context.Context, login string) ([]storage.Order, error)
 }
 
 //go:generate mockgen -destination=../mocks/mock_loyaltysystemmanager.go -package=mocks github.com/Schalure/gofermart/internal/server LoyaltySystemManager
