@@ -35,6 +35,20 @@ func (m *MockStorager) EXPECT() *MockStoragerMockRecorder {
 	return m.recorder
 }
 
+// AddNewOrder mocks base method.
+func (m *MockStorager) AddNewOrder(arg0 context.Context, arg1 storage.Order) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddNewOrder", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddNewOrder indicates an expected call of AddNewOrder.
+func (mr *MockStoragerMockRecorder) AddNewOrder(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddNewOrder", reflect.TypeOf((*MockStorager)(nil).AddNewOrder), arg0, arg1)
+}
+
 // AddNewUser mocks base method.
 func (m *MockStorager) AddNewUser(arg0 context.Context, arg1 storage.User) error {
 	m.ctrl.T.Helper()
@@ -47,6 +61,66 @@ func (m *MockStorager) AddNewUser(arg0 context.Context, arg1 storage.User) error
 func (mr *MockStoragerMockRecorder) AddNewUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddNewUser", reflect.TypeOf((*MockStorager)(nil).AddNewUser), arg0, arg1)
+}
+
+// GetOrderByNumber mocks base method.
+func (m *MockStorager) GetOrderByNumber(arg0 context.Context, arg1 string) (storage.Order, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrderByNumber", arg0, arg1)
+	ret0, _ := ret[0].(storage.Order)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrderByNumber indicates an expected call of GetOrderByNumber.
+func (mr *MockStoragerMockRecorder) GetOrderByNumber(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrderByNumber", reflect.TypeOf((*MockStorager)(nil).GetOrderByNumber), arg0, arg1)
+}
+
+// GetOrdersByLogin mocks base method.
+func (m *MockStorager) GetOrdersByLogin(arg0 context.Context, arg1 string) ([]storage.Order, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrdersByLogin", arg0, arg1)
+	ret0, _ := ret[0].([]storage.Order)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrdersByLogin indicates an expected call of GetOrdersByLogin.
+func (mr *MockStoragerMockRecorder) GetOrdersByLogin(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrdersByLogin", reflect.TypeOf((*MockStorager)(nil).GetOrdersByLogin), arg0, arg1)
+}
+
+// GetOrdersToUpdateStatus mocks base method.
+func (m *MockStorager) GetOrdersToUpdateStatus(arg0 context.Context) ([]storage.Order, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrdersToUpdateStatus", arg0)
+	ret0, _ := ret[0].([]storage.Order)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrdersToUpdateStatus indicates an expected call of GetOrdersToUpdateStatus.
+func (mr *MockStoragerMockRecorder) GetOrdersToUpdateStatus(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrdersToUpdateStatus", reflect.TypeOf((*MockStorager)(nil).GetOrdersToUpdateStatus), arg0)
+}
+
+// GetPointWithdraws mocks base method.
+func (m *MockStorager) GetPointWithdraws(arg0 context.Context, arg1 string) ([]storage.Order, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPointWithdraws", arg0, arg1)
+	ret0, _ := ret[0].([]storage.Order)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPointWithdraws indicates an expected call of GetPointWithdraws.
+func (mr *MockStoragerMockRecorder) GetPointWithdraws(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPointWithdraws", reflect.TypeOf((*MockStorager)(nil).GetPointWithdraws), arg0, arg1)
 }
 
 // GetUserByLogin mocks base method.
@@ -62,4 +136,18 @@ func (m *MockStorager) GetUserByLogin(arg0 context.Context, arg1 string) (storag
 func (mr *MockStoragerMockRecorder) GetUserByLogin(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByLogin", reflect.TypeOf((*MockStorager)(nil).GetUserByLogin), arg0, arg1)
+}
+
+// WithdrawPointsForOrder mocks base method.
+func (m *MockStorager) WithdrawPointsForOrder(arg0 context.Context, arg1 string, arg2 float64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithdrawPointsForOrder", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WithdrawPointsForOrder indicates an expected call of WithdrawPointsForOrder.
+func (mr *MockStoragerMockRecorder) WithdrawPointsForOrder(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithdrawPointsForOrder", reflect.TypeOf((*MockStorager)(nil).WithdrawPointsForOrder), arg0, arg1, arg2)
 }

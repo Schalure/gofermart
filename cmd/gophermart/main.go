@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/gofermart"
 	"github.com/Schalure/gofermart/internal/loggers"
+	"github.com/Schalure/gofermart/internal/loyaltysystem"
 	"github.com/Schalure/gofermart/internal/server"
 	"github.com/Schalure/gofermart/internal/storage/postgrestor"
 )
@@ -13,6 +15,9 @@ import (
 func main() {
 
 	log.Println("Starting application initialization...")
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	log.Println("Config initializing...")
 	config, err := configs.NewConfig()
@@ -24,13 +29,26 @@ func main() {
 	logger := loggers.NewLogger(config.AppConfig.Env)
 
 	log.Println("Storage initializing...")
-	storage := postgrestor.NewStorage()
+	storage, err := postgrestor.NewStorage(config.EnvConfig.DBHost)
+	if err != nil {
+		log.Panicln("Storage have been initialized with error:", err)
+	}
 
 	log.Println("Service initializing...")
-	service := gofermart.NewGofermart(storage, logger, config.AppConfig.LoginRules, config.AppConfig.PassRules, config.AppConfig.TokenTTL)
+	orderChecker := loyaltysystem.NewLoyaltySystem(config.EnvConfig.AccrualHost)
+	service := gofermart.NewGofermart(
+		storage, 
+		logger, 
+		orderChecker,
+		config.AppConfig.LoginRules, 
+		config.AppConfig.PassRules, 
+		config.AppConfig.OrderNumberRules, 
+		config.AppConfig.TokenTTL,
+	)
+	service.Run(ctx)
 
 	log.Println("HTTP server initializing...")
-	handler := server.NewHandler(service)
+	handler := server.NewHandler(service, service, service)
 	midleware := server.NewMidleware(logger, service)
 	server := server.NewServer(handler, midleware)
 

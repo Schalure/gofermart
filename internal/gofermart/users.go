@@ -99,6 +99,15 @@ func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password stri
 	return g.generateJWT(login)
 }
 
+//	Return user info
+func (g *Gofermart) GetUserInfo(ctx context.Context, login string) (storage.User, error) {
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second * 5)
+	defer cancel()
+	user, err := g.storager.GetUserByLogin(ctx, login)
+	return user, err
+}
+
 // Claims of JSON Web Token (JWT)
 type Claims struct {
 	jwt.RegisteredClaims
