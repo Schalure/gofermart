@@ -54,7 +54,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 		Number     string    `json:"number"`
 		Status     string    `json:"status"`
 		Accrual    float64   `json:"accrual,omitempty"`
-		UploadedAt time.Time `json:"uploaded_at"`
+		UploadedAt string `json:"uploaded_at"`
 	}
 
 	login := h.getLoginFromContext(r.Context())
@@ -78,7 +78,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 			Number:     order.OrderNumber,
 			Status:     string(order.OrderStatus),
 			Accrual:    order.BonusPoints,
-			UploadedAt: order.UploadedAt,
+			UploadedAt: order.UploadedAt.Format(time.RFC3339),
 		}
 	}
 

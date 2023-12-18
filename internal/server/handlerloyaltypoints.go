@@ -91,7 +91,7 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r *http.Request) {
 	type Withdrawal struct {
 		OrderNumber string    `json:"order"`
 		Sum         float64   `json:"sum"`
-		ProcessedAt time.Time `json:"processed_at"`
+		ProcessedAt string `json:"processed_at"`
 	}
 
 	login := h.getLoginFromContext(r.Context())
@@ -115,7 +115,7 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r *http.Request) {
 		withdrawals[i] = Withdrawal{
 			OrderNumber: order.OrderNumber,
 			Sum:         order.BonusPoints,
-			ProcessedAt: order.UploadedAt,
+			ProcessedAt: order.UploadedAt.Format(time.RFC3339),
 		}
 	}
 
