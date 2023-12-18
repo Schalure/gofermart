@@ -10,7 +10,7 @@ import (
 	"github.com/Schalure/gofermart/internal/storage"
 )
 
-//	Add new order to system
+// Add new order to system
 func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) error {
 
 	pc := "func (g *Gofermart) LoadOrder(login, orderNumber string) error"
@@ -66,7 +66,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 	return nil
 }
 
-//	Return info about orders by user
+// Return info about orders by user
 func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Order, error) {
 
 	pc := "func (g *Gofermart) GetOrders(login string) ([]storage.Order, error)"
@@ -86,7 +86,7 @@ func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Orde
 	return orders, nil
 }
 
-//	Order number validity check
+// Order number validity check
 func (g *Gofermart) isOrderValid(orderNumber string) bool {
 
 	if !g.validOrderNumber.MatchString(orderNumber) {
@@ -106,7 +106,7 @@ func (g *Gofermart) isOrderValid(orderNumber string) bool {
 	return LunaAlgorithm(orderNumberArr)
 }
 
-//	Checking by the Luna algorithm
+// Checking by the Luna algorithm
 func LunaAlgorithm(data []int) bool {
 
 	const k = 9

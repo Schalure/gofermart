@@ -21,7 +21,7 @@ func (u User) String() string {
 	return string(data)
 }
 
-//	Доступные статусы обработки расчётов:
+// Доступные статусы обработки расчётов:
 type OrderStatus string
 
 const (

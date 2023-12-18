@@ -11,7 +11,7 @@ import (
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 )
 
-//	Order registr handler. POST /api/user/orders
+// Order registr handler. POST /api/user/orders
 func (h *Handler) LoadOrder(w http.ResponseWriter, r *http.Request) {
 
 	login := h.getLoginFromContext(r.Context())
@@ -47,14 +47,14 @@ func (h *Handler) LoadOrder(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
-//	Get orders for user handler. GET /api/user/orders
+// Get orders for user handler. GET /api/user/orders
 func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 
 	type orderInfo struct {
-		Number     string    `json:"number"`
-		Status     string    `json:"status"`
-		Accrual    float64   `json:"accrual,omitempty"`
-		UploadedAt string `json:"uploaded_at"`
+		Number     string  `json:"number"`
+		Status     string  `json:"status"`
+		Accrual    float64 `json:"accrual,omitempty"`
+		UploadedAt string  `json:"uploaded_at"`
 	}
 
 	login := h.getLoginFromContext(r.Context())

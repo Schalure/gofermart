@@ -99,7 +99,7 @@ func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password stri
 	return g.generateJWT(login)
 }
 
-//	Return user info
+// Return user info
 func (g *Gofermart) GetUserInfo(ctx context.Context, login string) (storage.User, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)

@@ -48,7 +48,7 @@ func NewHandler(userManager UserManager, orderManager OrderManager, loyaltySyste
 	}
 }
 
-//	Get login from request context
+// Get login from request context
 func (h *Handler) getLoginFromContext(ctx context.Context) string {
 
 	login := ctx.Value(contextLoginKey)

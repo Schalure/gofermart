@@ -10,7 +10,7 @@ import (
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 )
 
-//	Get loyality points balance. GET /api/user/balance
+// Get loyality points balance. GET /api/user/balance
 func (h *Handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 
 	type Balance struct {
@@ -85,13 +85,13 @@ func (h *Handler) WithdrawLoyaltyPoints(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusOK)
 }
 
-//	Receiving information on withdrawal of funds. GET /api/user/withdrawals
+// Receiving information on withdrawal of funds. GET /api/user/withdrawals
 func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r *http.Request) {
 
 	type Withdrawal struct {
-		OrderNumber string    `json:"order"`
-		Sum         float64   `json:"sum"`
-		ProcessedAt string `json:"processed_at"`
+		OrderNumber string  `json:"order"`
+		Sum         float64 `json:"sum"`
+		ProcessedAt string  `json:"processed_at"`
 	}
 
 	login := h.getLoginFromContext(r.Context())

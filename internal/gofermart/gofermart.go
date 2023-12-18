@@ -75,7 +75,7 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 	}
 }
 
-//	Start service workers and other tasks
+// Start service workers and other tasks
 func (g *Gofermart) Run(ctx context.Context) {
 
 	//g.orderProvider.Run(ctx)
