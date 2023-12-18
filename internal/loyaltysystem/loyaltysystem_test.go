@@ -22,7 +22,7 @@ func Test_OrderCheck(t *testing.T) {
 		want struct{
 			order string
 			status OrderStatus
-			accrual int
+			accrual float64
 			statusCode int
 		}
 	}{
@@ -32,7 +32,7 @@ func Test_OrderCheck(t *testing.T) {
 			responseBody: `{"order":"1234567897","status":"PROCESSED","accrual":500}`,
 			responseCode: http.StatusOK,
 			responseDelay: time.Second * 0,
-			want: struct{order string; status OrderStatus; accrual int; statusCode int}{
+			want: struct{order string; status OrderStatus; accrual float64; statusCode int}{
 				order: "1234567897",
 				status: Processed,
 				accrual: 500,
@@ -45,7 +45,7 @@ func Test_OrderCheck(t *testing.T) {
 			responseBody: `{"order":"1234567897","status":"PROCESSED","accrual":500}`,
 			responseCode: http.StatusOK,
 			responseDelay: time.Second * 2,
-			want: struct{order string; status OrderStatus; accrual int; statusCode int}{
+			want: struct{order string; status OrderStatus; accrual float64; statusCode int}{
 				statusCode: 0,
 			},
 		},
