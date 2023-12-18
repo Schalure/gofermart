@@ -78,7 +78,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 			Number:     order.OrderNumber,
 			Status:     string(order.OrderStatus),
 			Accrual:    order.BonusPoints,
-			UploadedAt: order.UploadedAt.Format(time.RFC3339),
+			UploadedAt: order.UploadedOrder.Format(time.RFC3339),
 		}
 	}
 

@@ -195,7 +195,7 @@ func Test_GetOrdersWithdrawals(t *testing.T) {
 				{
 					OrderNumber: "2377225624",
 					BonusPoints: 500,
-					UploadedAt:  time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
+					UploadedBonus:  time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
 				},
 			},
 			want: struct {

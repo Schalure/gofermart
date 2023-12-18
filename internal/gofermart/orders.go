@@ -46,7 +46,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 		OrderNumber: orderNumber,
 		UserLogin:   login,
 		OrderStatus: storage.OrderStatusNew,
-		UploadedAt:  time.Now(),
+		UploadedOrder:  time.Now(),
 	}
 
 	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)

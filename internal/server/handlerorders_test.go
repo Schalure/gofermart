@@ -150,19 +150,19 @@ func Test_GetOrders(t *testing.T) {
 			orderManagerOrders: []storage.Order{
 				{
 					OrderNumber: "9278923470",
-					OrderStatus: "PROCESSED",
+					OrderStatus: storage.OrderStatusProcessed,
 					BonusPoints: 500,
-					UploadedAt:  time.Date(2020, 12, 10, 15, 15, 45, 0, time.FixedZone("", 60*60*3)),
+					UploadedOrder:  time.Date(2020, 12, 10, 15, 15, 45, 0, time.FixedZone("", 60*60*3)),
 				},
 				{
 					OrderNumber: "12345678903",
-					OrderStatus: "PROCESSING",
-					UploadedAt:  time.Date(2020, 12, 10, 15, 12, 1, 0, time.FixedZone("", 60*60*3)),
+					OrderStatus: storage.OrderStatusProcessing,
+					UploadedOrder:  time.Date(2020, 12, 10, 15, 12, 1, 0, time.FixedZone("", 60*60*3)),
 				},
 				{
 					OrderNumber: "346436439",
-					OrderStatus: "INVALID",
-					UploadedAt:  time.Date(2020, 12, 9, 16, 9, 53, 0, time.FixedZone("", 60*60*3)),
+					OrderStatus: storage.OrderStatusInvalid,
+					UploadedOrder:  time.Date(2020, 12, 9, 16, 9, 53, 0, time.FixedZone("", 60*60*3)),
 				},
 			},
 			orderManagerError: nil,
