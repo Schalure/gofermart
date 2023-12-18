@@ -49,24 +49,33 @@ func NewStorage(dbConnectionString string) (*Storage, error) {
 		uploaded_order TIMESTAMP WITH TIME ZONE NOT NULL,
 		bonus_points MONEY DEFAULT(0),
 		uploaded_bonus TIMESTAMP WITH TIME ZONE,
-		login VARCHAR(64) REFERENCES users(login)
+		login VARCHAR(64)
+		FOREIGN KEY (login) REFERENCES users(login) ON DELETE CASCADE
 	);`, storage.OrderStatusNew)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Storage{}, nil
+	return &Storage{
+		db: db,
+	}, nil
 }
 
 func (s *Storage) AddNewUser(ctx context.Context, user storage.User) error {
 
-	panic("no implemented: func (s *Storage) AddNewUser(ctx context.Context, user storage.User) error")
+	_, err := s.db.Exec(ctx, `INSERT INTO users (login, password) VALUES($1, $2);`, user.Login, user.Password)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.User, error) {
 
-	panic("no implemented: func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.User, error)")
-
+	var  user storage.User
+	row := s.db.QueryRow(ctx, `SELECT * FROM users WHERE login = $1;`, login)
+	err := row.Scan(&user.Login, &user.Password, &user.LoyaltyPoints, &user.WithdrawnPoints)
+	return user, err
 }
 
 func (s *Storage) AddNewOrder(ctx context.Context, order storage.Order) error {
