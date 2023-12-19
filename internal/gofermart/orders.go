@@ -8,6 +8,7 @@ import (
 
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/storage"
+	"github.com/jackc/pgx/pgtype"
 )
 
 // Add new order to system
@@ -36,7 +37,8 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 		)
 		if order.UserLogin == login {
 			return gofermaterrors.DublicateOrderNumberByUser
-		} else if order.UserLogin != login {
+		}
+		if order.UserLogin != login {
 			return gofermaterrors.DublicateOrderNumber
 		}
 		return gofermaterrors.Internal
@@ -46,7 +48,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 		OrderNumber: orderNumber,
 		UserLogin:   login,
 		OrderStatus: storage.OrderStatusNew,
-		UploadedOrder:  time.Now(),
+		UploadedOrder: pgtype.Timestamptz{Time: time.Now()},
 	}
 
 	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)

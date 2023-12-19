@@ -115,7 +115,7 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r *http.Request) {
 		withdrawals[i] = Withdrawal{
 			OrderNumber: order.OrderNumber,
 			Sum:         order.BonusPoints,
-			ProcessedAt: order.UploadedBonus.Format(time.RFC3339),
+			ProcessedAt: order.UploadedBonus.Time.Format(time.RFC3339),
 		}
 	}
 

@@ -20,8 +20,6 @@ type Gofermart struct {
 	loggerer Loggerer
 
 	orderChecker OrderChecker
-	workChannel  chan string
-	doneCh       chan struct{}
 
 	validPassword    *regexp.Regexp
 	validLogin       *regexp.Regexp

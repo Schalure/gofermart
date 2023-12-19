@@ -15,7 +15,7 @@ type Storage struct {
 
 func NewStorage(dbConnectionString string) (*Storage, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*100)
 	defer cancel()
 	db, err := pgxpool.New(ctx, dbConnectionString)
 	if err != nil {
@@ -24,34 +24,26 @@ func NewStorage(dbConnectionString string) (*Storage, error) {
 
 	//	Create table users
 	_, err = db.Exec(ctx, `
-		CREATE TABLE IF NOT EXIST users(
+		CREATE TABLE IF NOT EXISTS users(
 		login VARCHAR(64) PRIMARY KEY,
 		password VARCHAR(64) NOT NULL,
-		loyalty_points MONEY DEFAULT(0),
-		withdrawn_points MONEY DEFAULT(0));
+		loyalty_points DECIMAL DEFAULT(0),
+		withdrawn_points DECIMAL DEFAULT(0));
 	`)
 	if err != nil {
 		return nil, err
 	}
 
-	//	Create order status constants
-	_, err = db.Exec(ctx, 
-		`CREATE TYPE order_state AS ENUM ($1, $2, $3, $4);`, 
-		storage.OrderStatusNew, storage.OrderStatusProcessing, storage.OrderStatusInvalid, storage.OrderStatusProcessed) 
-		if err != nil {
-			return nil, err
-		}
-
 	_, err = db.Exec(ctx, `
-	CREATE TABLE IF NOT EXIST orders(
+		CREATE TABLE IF NOT EXISTS orders(
 		order_number VARCHAR(64) PRIMARY KEY,
-		order_status order_state DEFAULT($1),
+		order_status VARCHAR(16) DEFAULT('NEW') NOT NULL,
 		uploaded_order TIMESTAMP WITH TIME ZONE NOT NULL,
-		bonus_points MONEY DEFAULT(0),
-		uploaded_bonus TIMESTAMP WITH TIME ZONE,
-		login VARCHAR(64)
+		bonus_points DECIMAL DEFAULT(0),
+		uploaded_bonus TIMESTAMP WITH TIME ZONE NULL,
+		login VARCHAR(64),
 		FOREIGN KEY (login) REFERENCES users(login) ON DELETE CASCADE
-	);`, storage.OrderStatusNew)
+	);`)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +73,8 @@ func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.Use
 func (s *Storage) AddNewOrder(ctx context.Context, order storage.Order) error {
 
 	_, err := s.db.Exec(ctx,
-		`INSERT INTO orders (order_number, order_status, uploaded_order, login) VALUES($1, $2, $3, $4);`,
-		order.OrderNumber, order.OrderStatus, order.UploadedOrder.Format(time.RFC3339), order.UserLogin,
+		`INSERT INTO orders (order_number, uploaded_order, login) VALUES($1, $2, $3);`,
+		order.OrderNumber, order.UploadedOrder.Time.Format(time.RFC3339), order.UserLogin,
 	)
 	if err != nil {
 		return err
