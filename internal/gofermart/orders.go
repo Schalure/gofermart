@@ -88,6 +88,36 @@ func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Orde
 	return orders, nil
 }
 
+func (g *Gofermart) orderCheckWorker(ctx context.Context) {
+
+	ctxGetOrders, cancelGetOrders := context.WithTimeout(ctx, time.Second * 5)
+	orders, err := g.storager.GetOrdersToUpdateStatus(ctxGetOrders)
+	cancelGetOrders()
+	if err != nil {
+		return
+	}
+
+	g.ordersCash = make(map[string]storage.Order)
+	g.orderCashMutex.Lock()
+	for _, order := range orders {
+		g.ordersCash[order.OrderNumber] = order
+	}
+	g.orderCashMutex.Unlock()
+
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			
+
+		}
+	}
+
+
+}
+
 // Order number validity check
 func (g *Gofermart) isOrderValid(orderNumber string) bool {
 

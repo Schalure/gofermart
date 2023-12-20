@@ -4,6 +4,7 @@ package gofermart
 import (
 	"context"
 	"regexp"
+	"sync"
 	"time"
 
 	"github.com/Schalure/gofermart/internal/storage"
@@ -20,6 +21,10 @@ type Gofermart struct {
 	loggerer Loggerer
 
 	orderChecker OrderChecker
+
+	ordersCash map[string]storage.Order
+	orderCashMutex sync.RWMutex
+	inputCh chan storage.Order
 
 	validPassword    *regexp.Regexp
 	validLogin       *regexp.Regexp
@@ -65,6 +70,9 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 
 		orderChecker: orderChecker,
 
+		inputCh: make(chan storage.Order),
+
+
 		validLogin:       validLogin,
 		validPassword:    validPassword,
 		validOrderNumber: validOrderNumber,
@@ -77,4 +85,10 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 func (g *Gofermart) Run(ctx context.Context) {
 
 	//g.orderProvider.Run(ctx)
+}
+
+// Stoping service workers, other tasks and resources release
+func (g *Gofermart) Stop(ctx context.Context) {
+
+	close(g.inputCh)
 }
