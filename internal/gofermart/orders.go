@@ -97,22 +97,39 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 		return
 	}
 
-	g.ordersCash = make(map[string]storage.Order)
-	g.orderCashMutex.Lock()
 	for _, order := range orders {
-		g.ordersCash[order.OrderNumber] = order
+		g.ordersCash.add(order)
 	}
-	g.orderCashMutex.Unlock()
-
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		default:
-			
 
+			for {
+				if g.ordersCash.isEmpty() {
+					break
+				}
+				
+			}
+
+			g.orderCashMutex.RLock()
+			orderCashSize := len(g.ordersCash)
+			g.orderCashMutex.RUnlock()
+
+			for ; orderCashSize > 0; orderCashSize-- {
+				g.orderCashMutex.Lock()
+				for order = range g.ordersCash {
+					break
+				}
+				g.orderCashMutex.Unlock()
+			}
+			if
+			
 		}
+	}
+		
 	}
 
 
