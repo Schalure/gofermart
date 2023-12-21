@@ -114,6 +114,12 @@ func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage
 	return orders, nil
 }
 
+func (s *Storage) UpdateOrder(ctx context.Context, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error {
+
+	_, err := s.db.Exec(ctx, `UPDATE orders SET (order_status, bonus_points) VALUES($1, $2) WHERE order_number = $3;`, orderStatus, orderPoints, orderNumber);
+	return err
+}
+
 func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error) {
 
 	orders := make([]storage.Order, 0)

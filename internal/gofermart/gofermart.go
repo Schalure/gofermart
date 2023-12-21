@@ -4,6 +4,7 @@ package gofermart
 import (
 	"context"
 	"regexp"
+	"sync"
 	"time"
 
 	"github.com/Schalure/gofermart/internal/storage"
@@ -12,6 +13,7 @@ import (
 const (
 	PasswordMinLenght = 8
 	defaultSecretKey  = `poKdq834nFElq71`
+	numWorkers = 20
 )
 
 // Main service object struct
@@ -21,7 +23,9 @@ type Gofermart struct {
 
 	orderChecker OrderChecker
 
-	ordersCash *OrderCash
+	doneCh chan struct{}
+	inputCh chan storage.Order
+	wg sync.WaitGroup
 
 	validPassword    *regexp.Regexp
 	validLogin       *regexp.Regexp
@@ -47,6 +51,7 @@ type Storager interface {
 	AddNewUser(ctx context.Context, user storage.User) error
 	GetUserByLogin(ctx context.Context, login string) (storage.User, error)
 	AddNewOrder(ctx context.Context, order storage.Order) error
+	UpdateOrder(ctx context.Context, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error
 	GetOrderByNumber(ctx context.Context, orderNumber string) (storage.Order, error)
 	GetOrdersByLogin(ctx context.Context, login string) ([]storage.Order, error)
 	GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error)
@@ -67,7 +72,8 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 
 		orderChecker: orderChecker,
 
-		ordersCash: NewOrderCash(),
+		doneCh: make(chan struct{}),
+		inputCh: make(chan storage.Order),
 
 		validLogin:       validLogin,
 		validPassword:    validPassword,
@@ -80,7 +86,7 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 // Start service workers and other tasks
 func (g *Gofermart) Run(ctx context.Context) {
 
-	//g.orderProvider.Run(ctx)
+	go g.orderCheckWorker(ctx)
 }
 
 // Stoping service workers, other tasks and resources release
