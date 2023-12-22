@@ -54,7 +54,10 @@ func main() {
 	midleware := server.NewMidleware(logger, service)
 	server := server.NewServer(handler, midleware)
 
+	log.Println(config.EnvConfig.ServiceHost, config.EnvConfig.DBHost, config.EnvConfig.AccrualHost)
+
 	log.Println("Gofermart service have been started...")
+
 	err = server.Run(config.EnvConfig.ServiceHost)
 	server.Stop(err)
 }

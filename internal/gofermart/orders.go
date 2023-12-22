@@ -99,6 +99,10 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 	orders, err := g.storager.GetOrdersToUpdateStatus(ctxGetOrders)
 	cancelGetOrders()
 	if err != nil {
+		g.loggerer.Debugw(
+			"orderCheckWorker err with read database",
+			"err", err,
+		)
 		return
 	}
 
@@ -191,6 +195,10 @@ func (g *Gofermart) addToInputCh(order storage.Order) {
 	case <- g.doneCh:
 		return
 	case g.inputCh <- order:
+		g.loggerer.Debugw(
+			"add order to inputCh",
+			"order number", order.OrderNumber,
+		)
 	}
 }
 
