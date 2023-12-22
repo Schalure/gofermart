@@ -118,7 +118,10 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			g.doneCh <- struct{}{}
+			close(g.doneCh)
 			g.wg.Wait()
+			close(g.inputCh)
+			close(resultCh)
 			return
 		case status := <- resultCh:
 			if status == http.StatusTooManyRequests {
@@ -126,7 +129,10 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 				select {
 				case <-ctx.Done():
 					g.doneCh <- struct{}{}
+					close(g.doneCh)
 					g.wg.Wait()
+					close(g.inputCh)
+					close(resultCh)
 					return
 				case <-t.C:
 				}

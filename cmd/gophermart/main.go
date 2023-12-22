@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"os/signal"
+	"syscall"
 
 	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/gofermart"
@@ -16,8 +18,8 @@ func main() {
 
 	log.Println("Starting application initialization...")
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
 	log.Println("Config initializing...")
 	config, err := configs.NewConfig()
