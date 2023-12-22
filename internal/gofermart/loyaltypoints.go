@@ -43,8 +43,11 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 		return gofermaterrors.InsufficientFunds
 	}
 
+	user.LoyaltyPoints -= sum
+	user.WithdrawnPoints += sum
+
 	ctx, cancel = context.WithTimeout(ctx, time.Second*5)
-	err = g.storager.WithdrawPointsForOrder(ctx, orderNumber, sum)
+	err = g.storager.WithdrawPointsForOrder(ctx, orderNumber, sum, time.Now())
 	cancel()
 	if err != nil {
 		return gofermaterrors.Internal

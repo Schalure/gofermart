@@ -11,6 +11,7 @@ import (
 	"github.com/Schalure/gofermart/internal/mocks"
 	"github.com/Schalure/gofermart/internal/storage"
 	"github.com/golang/mock/gomock"
+	"github.com/jackc/pgx/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -195,7 +196,9 @@ func Test_GetOrdersWithdrawals(t *testing.T) {
 				{
 					OrderNumber: "2377225624",
 					BonusPoints: 500,
-					UploadedBonus:  time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
+					UploadedBonus:  pgtype.Timestamptz{
+						Time: time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
+					},//time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
 				},
 			},
 			want: struct {

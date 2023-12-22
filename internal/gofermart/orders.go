@@ -2,12 +2,14 @@ package gofermart
 
 import (
 	"context"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/storage"
+	"github.com/jackc/pgx/pgtype"
 )
 
 // Add new order to system
@@ -36,7 +38,8 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 		)
 		if order.UserLogin == login {
 			return gofermaterrors.DublicateOrderNumberByUser
-		} else if order.UserLogin != login {
+		}
+		if order.UserLogin != login {
 			return gofermaterrors.DublicateOrderNumber
 		}
 		return gofermaterrors.Internal
@@ -46,7 +49,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 		OrderNumber: orderNumber,
 		UserLogin:   login,
 		OrderStatus: storage.OrderStatusNew,
-		UploadedOrder:  time.Now(),
+		UploadedOrder: pgtype.Timestamptz{Time: time.Now()},
 	}
 
 	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)
@@ -62,6 +65,9 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 		)
 		return gofermaterrors.Internal
 	}
+
+	g.wg.Add(1)
+	go g.addToInputCh(order)
 
 	return nil
 }
@@ -84,6 +90,108 @@ func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Orde
 		return nil, err
 	}
 	return orders, nil
+}
+
+func (g *Gofermart) orderCheckWorker(ctx context.Context) {
+
+	//	1.	get orders to check from database
+	ctxGetOrders, cancelGetOrders := context.WithTimeout(ctx, time.Second * 5)
+	orders, err := g.storager.GetOrdersToUpdateStatus(ctxGetOrders)
+	cancelGetOrders()
+	if err != nil {
+		return
+	}
+
+	for _, order := range orders {
+		g.wg.Add(1)
+		go g.addToInputCh(order)
+	}
+
+	//	2.	run workers
+	resultCh := make(chan int)
+	for i := 0; i < numWorkers; i++ {
+		go g.worker(ctx, i, resultCh)
+	}
+
+	//	3.	run orderCheckWorker task
+	for {
+		select {
+		case <-ctx.Done():
+			g.doneCh <- struct{}{}
+			close(g.doneCh)
+			g.wg.Wait()
+			close(g.inputCh)
+			close(resultCh)
+			return
+		case status := <- resultCh:
+			if status == http.StatusTooManyRequests {
+				t := time.NewTimer(time.Second * 60)
+				select {
+				case <-ctx.Done():
+					g.doneCh <- struct{}{}
+					close(g.doneCh)
+					g.wg.Wait()
+					close(g.inputCh)
+					close(resultCh)
+					return
+				case <-t.C:
+				}
+			}
+		}
+	}
+}
+
+func (g *Gofermart) worker(ctx context.Context, workerID int, resultCh chan<- int) {
+	
+	pc := "func (g *Gofermart) worker(ctx context.Context, chanID int, resultCh chan<- int)"
+
+	for order := range g.inputCh {
+		g.loggerer.Debugw(
+			pc,
+			"message", "start processing order",
+			"workerId", workerID,
+			"order", order.String(),
+		)
+		ctx1, cancel1 := context.WithTimeout(ctx, time.Second)
+		res, status := g.orderChecker.OrderCheck(ctx1, order.OrderNumber)
+		cancel1()
+
+		if status == http.StatusOK && res.OrderStatus != order.OrderStatus {
+			ctx2, cancel2 := context.WithTimeout(ctx, time.Second)
+			cancel2()
+			err := g.storager.UpdateOrder(ctx2, res.OrderNumber, res.OrderStatus, res.BonusPoints)
+			if err != nil {
+				g.wg.Add(1)
+				go g.addToInputCh(order)
+				continue
+			}
+		}
+
+		if res.OrderStatus == storage.OrderStatusNew || res.OrderStatus == storage.OrderStatusProcessing {
+			g.wg.Add(1)
+			go g.addToInputCh(order)
+		}
+
+		resultCh <- status
+		g.loggerer.Debugw(
+			pc,
+			"message", "finish processing order",
+			"workerId", workerID,
+			"order", order.String(),
+			"status", status,
+		)
+	}
+}
+
+//	Add order to input channel
+func (g *Gofermart) addToInputCh(order storage.Order) {
+
+	defer g.wg.Done()
+	select {
+	case <- g.doneCh:
+		return
+	case g.inputCh <- order:
+	}
 }
 
 // Order number validity check

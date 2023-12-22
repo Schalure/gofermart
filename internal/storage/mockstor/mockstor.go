@@ -3,6 +3,7 @@ package mockstor
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Schalure/gofermart/internal/storage"
 )
@@ -49,12 +50,17 @@ func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage
 	panic("no implemented: func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage.Order, error)")
 }
 
+func (s *Storage) UpdateOrder(ctx context.Context, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error {
+
+	panic("no implemented: func (s *Storage) UpdateOrder(ctx context.Context, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error")
+}
+
 func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error) {
 
 	panic("no implemented: func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context, maxCount int) ([]storage.Order, error)")
 }
 
-func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64) error {
+func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64, uploaded_at time.Time) error {
 
 	panic("no implemented: func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum int) error")
 

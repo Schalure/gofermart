@@ -13,6 +13,7 @@ import (
 	"github.com/Schalure/gofermart/internal/mocks"
 	"github.com/Schalure/gofermart/internal/storage"
 	"github.com/golang/mock/gomock"
+	"github.com/jackc/pgx/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -152,17 +153,23 @@ func Test_GetOrders(t *testing.T) {
 					OrderNumber: "9278923470",
 					OrderStatus: storage.OrderStatusProcessed,
 					BonusPoints: 500,
-					UploadedOrder:  time.Date(2020, 12, 10, 15, 15, 45, 0, time.FixedZone("", 60*60*3)),
+					UploadedOrder:  pgtype.Timestamptz{
+						Time: time.Date(2020, 12, 10, 15, 15, 45, 0, time.FixedZone("", 60*60*3)),
+					},
 				},
 				{
 					OrderNumber: "12345678903",
 					OrderStatus: storage.OrderStatusProcessing,
-					UploadedOrder:  time.Date(2020, 12, 10, 15, 12, 1, 0, time.FixedZone("", 60*60*3)),
+					UploadedOrder:  pgtype.Timestamptz{
+						Time: time.Date(2020, 12, 10, 15, 12, 1, 0, time.FixedZone("", 60*60*3)),
+					},
 				},
 				{
 					OrderNumber: "346436439",
 					OrderStatus: storage.OrderStatusInvalid,
-					UploadedOrder:  time.Date(2020, 12, 9, 16, 9, 53, 0, time.FixedZone("", 60*60*3)),
+					UploadedOrder:  pgtype.Timestamptz{
+						Time: time.Date(2020, 12, 9, 16, 9, 53, 0, time.FixedZone("", 60*60*3)),
+					},
 				},
 			},
 			orderManagerError: nil,

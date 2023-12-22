@@ -20,7 +20,6 @@ func (h *Handler) LoadOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//	get url
 	orderNumber, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, fmt.Errorf("can`t read request body: %s", err.Error()).Error(), http.StatusBadRequest)
@@ -78,7 +77,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 			Number:     order.OrderNumber,
 			Status:     string(order.OrderStatus),
 			Accrual:    order.BonusPoints,
-			UploadedAt: order.UploadedOrder.Format(time.RFC3339),
+			UploadedAt: order.UploadedOrder.Time.Format(time.RFC3339),
 		}
 	}
 
