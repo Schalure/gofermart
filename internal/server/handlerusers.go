@@ -31,11 +31,11 @@ func (h *Handler) UserRegistration(response http.ResponseWriter, request *http.R
 	defer cancel()
 	token, err := h.userManager.CreateUser(ctx, authData.Login, authData.Password)
 	if err != nil {
-		if errors.Is(err, gofermaterrors.LoginAlreadyTaken) {
-			http.Error(response, gofermaterrors.LoginAlreadyTaken.Error(), http.StatusConflict)
+		if errors.Is(err, gofermaterrors.ErrLoginAlreadyTaken) {
+			http.Error(response, gofermaterrors.ErrLoginAlreadyTaken.Error(), http.StatusConflict)
 			return
 		}
-		http.Error(response, gofermaterrors.Internal.Error(), http.StatusInternalServerError)
+		http.Error(response, gofermaterrors.ErrInternal.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -59,11 +59,11 @@ func (h *Handler) UserAuthentication(response http.ResponseWriter, request *http
 	defer cancel()
 	token, err := h.userManager.AuthenticationUser(ctx, authData.Login, authData.Password)
 	if err != nil {
-		if errors.Is(err, gofermaterrors.InvalidLoginPassword) {
+		if errors.Is(err, gofermaterrors.ErrInvalidLoginPassword) {
 			http.Error(response, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		http.Error(response, gofermaterrors.Internal.Error(), http.StatusInternalServerError)
+		http.Error(response, gofermaterrors.ErrInternal.Error(), http.StatusInternalServerError)
 	}
 
 	http.SetCookie(response, &http.Cookie{

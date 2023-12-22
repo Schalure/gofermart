@@ -70,15 +70,15 @@ func (h *Handler) WithdrawLoyaltyPoints(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err := h.loyaltySystemManager.Withdraw(r.Context(), login, order.OrderNumber, order.Sum); err != nil {
-		if errors.Is(err, gofermaterrors.InvalidOrderNumber) {
-			http.Error(w, gofermaterrors.InvalidOrderNumber.Error(), http.StatusUnprocessableEntity)
+		if errors.Is(err, gofermaterrors.ErrInvalidOrderNumber) {
+			http.Error(w, gofermaterrors.ErrInvalidOrderNumber.Error(), http.StatusUnprocessableEntity)
 			return
 		}
-		if errors.Is(err, gofermaterrors.InsufficientFunds) {
-			http.Error(w, gofermaterrors.InsufficientFunds.Error(), http.StatusPaymentRequired)
+		if errors.Is(err, gofermaterrors.ErrInsufficientFunds) {
+			http.Error(w, gofermaterrors.ErrInsufficientFunds.Error(), http.StatusPaymentRequired)
 			return
 		}
-		http.Error(w, gofermaterrors.Internal.Error(), http.StatusInternalServerError)
+		http.Error(w, gofermaterrors.ErrInternal.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -102,11 +102,11 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r *http.Request) {
 
 	orders, err := h.loyaltySystemManager.GetWithdraws(r.Context(), login)
 	if err != nil {
-		if errors.Is(err, gofermaterrors.NoData) {
+		if errors.Is(err, gofermaterrors.ErrNoData) {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
-		http.Error(w, gofermaterrors.Internal.Error(), http.StatusInternalServerError)
+		http.Error(w, gofermaterrors.ErrInternal.Error(), http.StatusInternalServerError)
 		return
 	}
 

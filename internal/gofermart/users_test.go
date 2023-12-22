@@ -48,7 +48,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.LoginAlreadyTaken,
+				err:          gofermaterrors.ErrLoginAlreadyTaken,
 				passwordHash: "",
 			},
 		},
@@ -60,7 +60,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.InvalidLogin,
+				err:          gofermaterrors.ErrInvalidLogin,
 				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
 			},
 		},
@@ -72,7 +72,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.InvalidLogin,
+				err:          gofermaterrors.ErrInvalidLogin,
 				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
 			},
 		},
@@ -84,7 +84,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.PasswordShort,
+				err:          gofermaterrors.ErrPasswordShort,
 				passwordHash: "",
 			},
 		},
@@ -96,7 +96,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.PasswordBad,
+				err:          gofermaterrors.ErrPasswordBad,
 				passwordHash: "",
 			},
 		},
@@ -159,7 +159,7 @@ func Test_UserAuthentication(t *testing.T) {
 			loginToCheck:    "Sasha",
 			passwordToCheck: "q1w2e3r4",
 			want: struct{ err error }{
-				err: gofermaterrors.InvalidLoginPassword,
+				err: gofermaterrors.ErrInvalidLoginPassword,
 			},
 		}, {
 			name:            "bad password",
@@ -168,7 +168,7 @@ func Test_UserAuthentication(t *testing.T) {
 			loginToCheck:    "Sasha",
 			passwordToCheck: "",
 			want: struct{ err error }{
-				err: gofermaterrors.InvalidLoginPassword,
+				err: gofermaterrors.ErrInvalidLoginPassword,
 			},
 		},
 	}

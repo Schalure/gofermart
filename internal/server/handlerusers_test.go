@@ -55,7 +55,7 @@ func Test_UserRegistration(t *testing.T) {
 		{
 			name:        "dublicate test",
 			requestBody: `{"login":"Mihail","password":"q1w2e3r4"}`,
-			gomockCall:  mockUserManager.EXPECT().CreateUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("", gofermaterrors.LoginAlreadyTaken),
+			gomockCall:  mockUserManager.EXPECT().CreateUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("", gofermaterrors.ErrLoginAlreadyTaken),
 			want: struct {
 				statusCode int
 				token      string
@@ -76,7 +76,7 @@ func Test_UserRegistration(t *testing.T) {
 		{
 			name:        "empty body",
 			requestBody: `{}`,
-			gomockCall:  mockUserManager.EXPECT().CreateUser(gomock.Any(), "", "").Return("", gofermaterrors.InvalidLogin),
+			gomockCall:  mockUserManager.EXPECT().CreateUser(gomock.Any(), "", "").Return("", gofermaterrors.ErrInvalidLogin),
 			want: struct {
 				statusCode int
 				token      string
@@ -152,7 +152,7 @@ func Test_UserAuthentication(t *testing.T) {
 		{
 			name:        "invalid login or password",
 			requestBody: `{"login":"Mihail","password":"q1w2e3r4"}`,
-			gomockCall:  mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("", gofermaterrors.InvalidLoginPassword),
+			gomockCall:  mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "Mihail", "q1w2e3r4").Return("", gofermaterrors.ErrInvalidLoginPassword),
 			want: struct {
 				statusCode int
 				token      string
@@ -173,7 +173,7 @@ func Test_UserAuthentication(t *testing.T) {
 		{
 			name:        "empty body",
 			requestBody: `{}`,
-			gomockCall:  mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "", "").Return("", gofermaterrors.InvalidLoginPassword),
+			gomockCall:  mockUserManager.EXPECT().AuthenticationUser(gomock.Any(), "", "").Return("", gofermaterrors.ErrInvalidLoginPassword),
 			want: struct {
 				statusCode int
 				token      string

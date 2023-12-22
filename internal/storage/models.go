@@ -27,9 +27,9 @@ type OrderStatus string
 
 const (
 	OrderStatusNew        OrderStatus = "NEW"        //	заказ загружен в систему, но не попал в обработку
-	OrderStatusProcessing             = "PROCESSING" //	вознаграждение за заказ рассчитывается
-	OrderStatusInvalid                = "INVALID"    //	система расчёта вознаграждений отказала в расчёте
-	OrderStatusProcessed              = "PROCESSED"  //	данные по заказу проверены и информация о расчёте успешно получена
+	OrderStatusProcessing OrderStatus             = "PROCESSING" //	вознаграждение за заказ рассчитывается
+	OrderStatusInvalid OrderStatus                = "INVALID"    //	система расчёта вознаграждений отказала в расчёте
+	OrderStatusProcessed OrderStatus              = "PROCESSED"  //	данные по заказу проверены и информация о расчёте успешно получена
 )
 
 type Order struct {

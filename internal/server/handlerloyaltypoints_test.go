@@ -86,6 +86,8 @@ func Test_GetBalance(t *testing.T) {
 			var buf bytes.Buffer
 			_, err = buf.ReadFrom(resp.Body)
 			require.NoError(t, err)
+			defer resp.Body.Close()
+
 			assert.JSONEq(t, buf.String(), test.want.data)
 		})
 	}
@@ -151,6 +153,8 @@ func Test_WithdrawLoyaltyPoints(t *testing.T) {
 
 			resp, err := testServer.Client().Do(req)
 			require.NoError(t, err)
+			defer resp.Body.Close()
+
 
 			assert.Equal(t, test.want.statusCode, resp.StatusCode)
 
@@ -234,6 +238,8 @@ func Test_GetOrdersWithdrawals(t *testing.T) {
 			var buf bytes.Buffer
 			_, err = buf.ReadFrom(resp.Body)
 			require.NoError(t, err)
+			defer resp.Body.Close()
+
 			assert.JSONEq(t, test.want.data, buf.String())
 		})
 	}

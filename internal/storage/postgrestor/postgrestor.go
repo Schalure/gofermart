@@ -144,7 +144,7 @@ func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order,
 	return orders, nil
 }
 
-func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64, uploaded_at time.Time) error {
+func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64, uploadedAt time.Time) error {
 
 	tx, err := s.db.Begin(ctx)
 	if err != nil {
@@ -162,7 +162,7 @@ func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string
 
 	if _, err = tx.Exec(ctx,
 		`UPDATE orders SET (bonus_points = $1, uploaded_bonus = $2) WHERE order_number = $3;`,
-		sum, uploaded_at, orderNumber,
+		sum, uploadedAt, orderNumber,
 	); err != nil {
 		return err
 	}

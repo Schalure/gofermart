@@ -18,18 +18,18 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 			"message", "order number is not valid",
 			"orderNumber", orderNumber,
 		)
-		return gofermaterrors.InvalidOrderNumber
+		return gofermaterrors.ErrInvalidOrderNumber
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	order, err := g.storager.GetOrderByNumber(ctx, orderNumber)
 	cancel()
 	if err != nil {
-		return gofermaterrors.InvalidOrderNumber
+		return gofermaterrors.ErrInvalidOrderNumber
 	}
 
 	if order.UserLogin != login {
-		return gofermaterrors.InvalidOrderNumber
+		return gofermaterrors.ErrInvalidOrderNumber
 	}
 
 	ctx, cancel = context.WithTimeout(ctx, time.Second*5)
@@ -40,7 +40,7 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 	}
 
 	if user.LoyaltyPoints < sum {
-		return gofermaterrors.InsufficientFunds
+		return gofermaterrors.ErrInsufficientFunds
 	}
 
 	user.LoyaltyPoints -= sum
@@ -50,7 +50,7 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 	err = g.storager.WithdrawPointsForOrder(ctx, orderNumber, sum, time.Now())
 	cancel()
 	if err != nil {
-		return gofermaterrors.Internal
+		return gofermaterrors.ErrInternal
 	}
 
 	return nil
@@ -62,7 +62,7 @@ func (g *Gofermart) GetWithdraws(ctx context.Context, login string) ([]storage.O
 	orders, err := g.storager.GetPointWithdraws(ctx, login)
 	cancel()
 	if err != nil {
-		return nil, gofermaterrors.NoOrdersForPoints
+		return nil, gofermaterrors.ErrNoOrdersForPoints
 	}
 	return orders, nil
 }

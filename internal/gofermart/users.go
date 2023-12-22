@@ -24,7 +24,7 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 			"error", err,
 			"login", login,
 		)
-		return "", gofermaterrors.InvalidLogin
+		return "", gofermaterrors.ErrInvalidLogin
 	}
 
 	if _, err := g.storager.GetUserByLogin(ctx, login); err == nil {
@@ -32,7 +32,7 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 			pc,
 			"error", err,
 		)
-		return "", gofermaterrors.LoginAlreadyTaken
+		return "", gofermaterrors.ErrLoginAlreadyTaken
 	}
 
 	if err := g.isPasswordValid(password); err != nil {
@@ -53,7 +53,7 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 			pc,
 			"error", err,
 		)
-		return "", gofermaterrors.Internal
+		return "", gofermaterrors.ErrInternal
 	}
 
 	token, err := g.generateJWT(login)
@@ -62,7 +62,7 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 			pc,
 			"error", err,
 		)
-		return "", gofermaterrors.Internal
+		return "", gofermaterrors.ErrInternal
 	}
 
 	g.loggerer.Debugw(
@@ -85,7 +85,7 @@ func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password stri
 			pc,
 			"error", err,
 		)
-		return "", gofermaterrors.InvalidLoginPassword
+		return "", gofermaterrors.ErrInvalidLoginPassword
 	}
 
 	if g.generatePasswordHash(password) != user.Password {
@@ -93,7 +93,7 @@ func (g *Gofermart) AuthenticationUser(ctx context.Context, login, password stri
 			pc,
 			"error", "the password hash didn't match",
 		)
-		return "", gofermaterrors.InvalidLoginPassword
+		return "", gofermaterrors.ErrInvalidLoginPassword
 	}
 
 	return g.generateJWT(login)
@@ -160,11 +160,11 @@ func (g *Gofermart) generateJWT(login string) (string, error) {
 func (g *Gofermart) isLoginValid(login string) error {
 
 	if len(login) == 0 {
-		return gofermaterrors.InvalidLogin
+		return gofermaterrors.ErrInvalidLogin
 	}
 
 	if !g.validLogin.MatchString(login) {
-		return gofermaterrors.InvalidLogin
+		return gofermaterrors.ErrInvalidLogin
 	}
 
 	return nil
@@ -176,11 +176,11 @@ func (g *Gofermart) isPasswordValid(password string) error {
 	var errs []error
 
 	if len(password) < PasswordMinLenght {
-		errs = append(errs, gofermaterrors.PasswordShort)
+		errs = append(errs, gofermaterrors.ErrPasswordShort)
 	}
 
 	if !g.validPassword.MatchString(password) {
-		errs = append(errs, gofermaterrors.PasswordBad)
+		errs = append(errs, gofermaterrors.ErrPasswordBad)
 	}
 
 	return errors.Join(errs...)

@@ -23,7 +23,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 			"message", "order number is not valid",
 			"orderNumber", orderNumber,
 		)
-		return gofermaterrors.InvalidOrderNumber
+		return gofermaterrors.ErrInvalidOrderNumber
 	}
 
 	ctx1, cancel1 := context.WithTimeout(ctx, time.Second*5)
@@ -37,12 +37,12 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 			"error", err,
 		)
 		if order.UserLogin == login {
-			return gofermaterrors.DublicateOrderNumberByUser
+			return gofermaterrors.ErrDublicateOrderNumberByUser
 		}
 		if order.UserLogin != login {
-			return gofermaterrors.DublicateOrderNumber
+			return gofermaterrors.ErrDublicateOrderNumber
 		}
-		return gofermaterrors.Internal
+		return gofermaterrors.ErrInternal
 	}
 
 	order = storage.Order{
@@ -63,7 +63,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 			"user", login,
 			"error", err,
 		)
-		return gofermaterrors.Internal
+		return gofermaterrors.ErrInternal
 	}
 
 	g.wg.Add(1)

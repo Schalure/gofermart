@@ -57,7 +57,7 @@ func Test_LoadOrder(t *testing.T) {
 		{
 			name:                   "invalid order test",
 			requestOrder:           "123456789",
-			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "123456789").Return(gofermaterrors.InvalidOrderNumber),
+			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "123456789").Return(gofermaterrors.ErrInvalidOrderNumber),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
 			want: struct{ statusCode int }{
 				statusCode: http.StatusUnprocessableEntity,
@@ -66,7 +66,7 @@ func Test_LoadOrder(t *testing.T) {
 		{
 			name:                   "dublicate order number by user test",
 			requestOrder:           "1234567897",
-			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.DublicateOrderNumberByUser),
+			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.ErrDublicateOrderNumberByUser),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
 			want: struct{ statusCode int }{
 				statusCode: http.StatusOK,
@@ -75,7 +75,7 @@ func Test_LoadOrder(t *testing.T) {
 		{
 			name:                   "dublicate order number test",
 			requestOrder:           "1234567897",
-			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.DublicateOrderNumber),
+			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.ErrDublicateOrderNumber),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
 			want: struct{ statusCode int }{
 				statusCode: http.StatusConflict,
@@ -92,7 +92,7 @@ func Test_LoadOrder(t *testing.T) {
 		{
 			name:                   "other errors test",
 			requestOrder:           "1234567897",
-			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.Internal),
+			orderManagerGomockCall: orderManager.EXPECT().LoadOrder(gomock.Any(), "Petya", "1234567897").Return(gofermaterrors.ErrInternal),
 			tokenChekerGomockCall:  tokenCheker.EXPECT().CheckValidJWT("qqqq").Return("Petya", nil),
 			want: struct{ statusCode int }{
 				statusCode: http.StatusInternalServerError,
@@ -109,6 +109,7 @@ func Test_LoadOrder(t *testing.T) {
 
 			resp, err := testServer.Client().Do(req)
 			require.NoError(t, err)
+			defer resp.Body.Close()
 
 			assert.Equal(t, test.want.statusCode, resp.StatusCode)
 		})
@@ -217,6 +218,8 @@ func Test_GetOrders(t *testing.T) {
 			var buf bytes.Buffer
 			_, err = buf.ReadFrom(resp.Body)
 			require.NoError(t, err)
+			defer resp.Body.Close()
+
 			assert.JSONEq(t, test.want.data, buf.String())
 
 		})
