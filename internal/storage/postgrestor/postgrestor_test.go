@@ -65,7 +65,7 @@ func Test_User(t *testing.T) {
 			assert.EqualValues(t, test.user, user)
 
 			err = stor.AddNewOrder(context.Background(), test.order)
-			require.NoError(t, err, "can't get order: %s", test.order.String())
+			require.NoError(t, err, "can't add order: %s", test.order.String())
 
 			order, err := stor.GetOrderByNumber(context.Background(), test.order.OrderNumber)
 			require.NoError(t, err, "can't get order: %s", test.order.OrderNumber)

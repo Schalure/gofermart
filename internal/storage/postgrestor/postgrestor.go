@@ -41,6 +41,7 @@ func NewStorage(dbConnectionString string) (*Storage, error) {
 		uploaded_order TIMESTAMP WITH TIME ZONE NOT NULL,
 		bonus_points DECIMAL DEFAULT(0),
 		uploaded_bonus TIMESTAMP WITH TIME ZONE NULL,
+		bonus_withdraw DECIMAL DEFAULT(0),
 		login VARCHAR(64),
 		FOREIGN KEY (login) REFERENCES users(login) ON DELETE CASCADE
 	);`)
@@ -86,7 +87,7 @@ func (s *Storage) GetOrderByNumber(ctx context.Context, orderNumber string) (sto
 
 	var order storage.Order
 	row := s.db.QueryRow(ctx, `SELECT * FROM orders WHERE order_number = $1;`, orderNumber)
-	err := row.Scan(&order.OrderNumber, &order.OrderStatus, &order.UploadedOrder, &order.BonusPoints, &order.UploadedBonus, &order.UserLogin)
+	err := row.Scan(&order.OrderNumber, &order.OrderStatus, &order.UploadedOrder, &order.BonusPoints, &order.UploadedBonus, &order.BonusWithdraw, &order.UserLogin)
 	return order, err
 }
 
@@ -105,7 +106,7 @@ func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage
 
 	for rows.Next() {
 		var o storage.Order
-		err := rows.Scan(&o.OrderNumber, &o.OrderStatus, &o.UploadedOrder, &o.BonusPoints, &o.UploadedBonus, &o.UserLogin)
+		err := rows.Scan(&o.OrderNumber, &o.OrderStatus, &o.UploadedOrder, &o.BonusPoints, &o.UploadedBonus, &o.BonusWithdraw, &o.UserLogin)
 		if err != nil {
 			return nil, err
 		}
@@ -155,7 +156,7 @@ func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order,
 
 	for rows.Next() {
 		var o storage.Order
-		err := rows.Scan(&o.OrderNumber, &o.OrderStatus, &o.UploadedOrder, &o.BonusPoints, &o.UploadedBonus, &o.UserLogin)
+		err := rows.Scan(&o.OrderNumber, &o.OrderStatus, &o.UploadedOrder, &o.BonusPoints, &o.UploadedBonus, &o.BonusWithdraw,  &o.UserLogin)
 		if err != nil {
 			return nil, err
 		}
@@ -181,7 +182,7 @@ func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string
 	}
 
 	if _, err = tx.Exec(ctx,
-		`UPDATE orders SET bonus_points = $1, uploaded_bonus = $2 WHERE order_number = $3;`,
+		`UPDATE orders SET bonus_withdraw = $1, uploaded_bonus = $2 WHERE order_number = $3;`,
 		sum, uploadedAt, orderNumber,
 	); err != nil {
 		return err
@@ -204,7 +205,7 @@ func (s *Storage) GetPointWithdraws(ctx context.Context, login string) ([]storag
 
 	for rows.Next() {
 		var o storage.Order
-		err := rows.Scan(&o.OrderNumber, &o.OrderStatus, &o.UploadedOrder, &o.BonusPoints, &o.UploadedBonus, &o.UserLogin)
+		err := rows.Scan(&o.OrderNumber, &o.OrderStatus, &o.UploadedOrder, &o.BonusPoints, &o.UploadedBonus, &o.BonusWithdraw, &o.UserLogin)
 		if err != nil {
 			return nil, err
 		}

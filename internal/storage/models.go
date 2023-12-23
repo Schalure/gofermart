@@ -35,11 +35,10 @@ const (
 type Order struct {
 	OrderNumber string      `json:"number" db:"order_number"`
 	OrderStatus OrderStatus `json:"status" db:"order_status"`
-//	UploadedOrder time.Time `json:"uploaded_order" db:"uploaded_order"`
 	UploadedOrder pgtype.Timestamptz `json:"uploaded_order" db:"uploaded_order"`
 	BonusPoints float64     `json:"accural" db:"bonus_points"`
-//	UploadedBonus time.Time `json:"uploaded_bonus" db:"uploaded_bonus"`
 	UploadedBonus pgtype.Timestamptz `json:"uploaded_bonus" db:"uploaded_bonus"`
+	BonusWithdraw float64 `json:"bonus_withdraw" db:"bonus_withdraw"`
 	UserLogin   string      `json:"login" db:"user_login"`
 }
 

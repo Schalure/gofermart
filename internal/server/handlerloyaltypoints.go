@@ -114,7 +114,7 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r *http.Request) {
 	for i, order := range orders {
 		withdrawals[i] = Withdrawal{
 			OrderNumber: order.OrderNumber,
-			Sum:         order.BonusPoints,
+			Sum:         order.BonusWithdraw,
 			ProcessedAt: order.UploadedBonus.Time.Format(time.RFC3339),
 		}
 	}
