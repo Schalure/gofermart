@@ -140,17 +140,17 @@ func (mr *MockStoragerMockRecorder) GetUserByLogin(arg0, arg1 interface{}) *gomo
 }
 
 // UpdateOrder mocks base method.
-func (m *MockStorager) UpdateOrder(arg0 context.Context, arg1 string, arg2 storage.OrderStatus, arg3 float64) error {
+func (m *MockStorager) UpdateOrder(arg0 context.Context, arg1, arg2 string, arg3 storage.OrderStatus, arg4 float64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateOrder", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "UpdateOrder", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateOrder indicates an expected call of UpdateOrder.
-func (mr *MockStoragerMockRecorder) UpdateOrder(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *MockStoragerMockRecorder) UpdateOrder(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrder", reflect.TypeOf((*MockStorager)(nil).UpdateOrder), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOrder", reflect.TypeOf((*MockStorager)(nil).UpdateOrder), arg0, arg1, arg2, arg3, arg4)
 }
 
 // WithdrawPointsForOrder mocks base method.

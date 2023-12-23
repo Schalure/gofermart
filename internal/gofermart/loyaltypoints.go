@@ -21,9 +21,9 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 		return gofermaterrors.ErrInvalidOrderNumber
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
-	order, err := g.storager.GetOrderByNumber(ctx, orderNumber)
-	cancel()
+	ctx1, cancel1 := context.WithTimeout(ctx, time.Second*5)
+	order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)
+	cancel1()
 	if err != nil {
 		return gofermaterrors.ErrInvalidOrderNumber
 	}
@@ -32,9 +32,9 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 		return gofermaterrors.ErrInvalidOrderNumber
 	}
 
-	ctx, cancel = context.WithTimeout(ctx, time.Second*5)
-	user, err := g.storager.GetUserByLogin(ctx, login)
-	cancel()
+	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)
+	user, err := g.storager.GetUserByLogin(ctx2, login)
+	cancel2()
 	if err != nil {
 		return err
 	}
@@ -46,9 +46,9 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 	user.LoyaltyPoints -= sum
 	user.WithdrawnPoints += sum
 
-	ctx, cancel = context.WithTimeout(ctx, time.Second*5)
-	err = g.storager.WithdrawPointsForOrder(ctx, orderNumber, sum, time.Now())
-	cancel()
+	ctx3, cancel3 := context.WithTimeout(ctx, time.Second*5)
+	err = g.storager.WithdrawPointsForOrder(ctx3, orderNumber, sum, time.Now())
+	cancel3()
 	if err != nil {
 		return gofermaterrors.ErrInternal
 	}

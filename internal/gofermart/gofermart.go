@@ -51,7 +51,7 @@ type Storager interface {
 	AddNewUser(ctx context.Context, user storage.User) error
 	GetUserByLogin(ctx context.Context, login string) (storage.User, error)
 	AddNewOrder(ctx context.Context, order storage.Order) error
-	UpdateOrder(ctx context.Context, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error
+	UpdateOrder(ctx context.Context, userLogin string, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error
 	GetOrderByNumber(ctx context.Context, orderNumber string) (storage.Order, error)
 	GetOrdersByLogin(ctx context.Context, login string) ([]storage.Order, error)
 	GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error)

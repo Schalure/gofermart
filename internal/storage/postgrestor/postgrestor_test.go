@@ -26,6 +26,7 @@ func Test_User(t *testing.T) {
 		name string
 		user storage.User
 		order storage.Order
+		updateOrder storage.Order
 	}{
 		{
 			name: "simple test",
@@ -43,7 +44,11 @@ func Test_User(t *testing.T) {
 				BonusPoints: 0,
 				UploadedBonus: pgtype.Timestamptz{Status: pgtype.Null,},
 				UserLogin: "Petya",
-
+			},
+			updateOrder: storage.Order{
+				OrderNumber: "1234567897",
+				OrderStatus: storage.OrderStatusProcessed,
+				BonusPoints: 500,
 			},
 		},
 	}
@@ -65,6 +70,16 @@ func Test_User(t *testing.T) {
 			order, err := stor.GetOrderByNumber(context.Background(), test.order.OrderNumber)
 			require.NoError(t, err, "can't get order: %s", test.order.OrderNumber)
 			assert.EqualValues(t, test.order, order)
+
+			err = stor.UpdateOrder(context.Background(), test.user.Login, test.updateOrder.OrderNumber, test.updateOrder.OrderStatus, test.updateOrder.BonusPoints)
+			require.NoError(t, err, "can't update order: %s", test.updateOrder.OrderNumber)
+
+			test.user.LoyaltyPoints = test.updateOrder.BonusPoints
+
+			user, err = stor.GetUserByLogin(context.Background(), test.user.Login)
+			require.NoError(t, err, "can't get user: %s", test.user.Login)
+			assert.EqualValues(t, test.user, user)
+
 		})
 	}
 }

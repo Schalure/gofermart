@@ -14,6 +14,7 @@ func NewServer(handler *Handler, midleware *Middleware) *Server {
 
 	r := chi.NewRouter()
 
+	r.Use((midleware.WithLogging))
 	r.Post("/api/user/register", handler.UserRegistration)
 	r.Post("/api/user/login", handler.UserAuthentication)
 

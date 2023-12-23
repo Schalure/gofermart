@@ -47,7 +47,6 @@ func newEnvConfig() *EnvConfig {
 // Parse application flags
 func (c *EnvConfig) parseFlags() {
 
-	pc := "func (c *Config) parseFlags()"
 
 	serviceHost := *flag.String("a", "", "Service host addres. Example: 127.0.0.1:8080")
 	dbHost := *flag.String("d", "", "Database host addres. Example: 127.0.0.1:8080")
@@ -58,26 +57,18 @@ func (c *EnvConfig) parseFlags() {
 
 	if isValidHostAddres(serviceHost) {
 		c.ServiceHost = serviceHost
-	} else {
-		log.Printf("Using value by default. %s: serviceHost value is not valid: %s", pc, serviceHost)
 	}
 
 	if isValidHostAddres(dbHost) {
 		c.DBHost = dbHost
-	} else {
-		log.Printf("Using value by default. %s: dbHost value is not valid: %s", pc, dbHost)
 	}
 
 	if isValidHostAddres(accrualHost) {
 		c.AccrualHost = accrualHost
-	} else {
-		log.Printf("Using value by default. %s: accrualHost value is not valid: %s", pc, accrualHost)
 	}
 
 	if appConfigFilePath != "" {
 		c.AppConfigFilePath = appConfigFilePath
-	} else {
-		log.Printf("Using value by default. %s: appConfigFilePath value is not valid: %s", pc, appConfigFilePath)
 	}
 }
 
@@ -95,16 +86,14 @@ func (c *EnvConfig) parseEnvironmental() {
 	}
 
 	if dbHost, ok := os.LookupEnv(envNameDBHost); ok {
-		if isValidHostAddres(dbHost) {
 			c.DBHost = dbHost
-		} else {
-			log.Printf("Using value by default. %s: dbHost value is not valid: %s", pc, dbHost)
-		}
+	} else {
+		log.Printf("Using value by default. %s: dbHost value is not valid: %s", pc, dbHost)
 	}
 
 	if accrualHost, ok := os.LookupEnv(envNameAccrualHost); ok {
 		if isValidHostAddres(accrualHost) {
-			c.ServiceHost = accrualHost
+			c.AccrualHost = accrualHost
 		} else {
 			log.Printf("Using value by default. %s: accrualHost value is not valid: %s", pc, accrualHost)
 		}

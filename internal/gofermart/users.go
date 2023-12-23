@@ -131,8 +131,11 @@ func (g *Gofermart) CheckValidJWT(tokenString string) (string, error) {
 		return "", errors.New("token not valid")
 	}
 
-	if claims.RegisteredClaims.ExpiresAt.Time.After(time.Now()) {
-		return "", errors.New("token obsolete")
+	if claims.RegisteredClaims.ExpiresAt.Time.Before(time.Now()) {
+		return "", fmt.Errorf("token obsolete: token time = %s, now time = %s",
+		claims.RegisteredClaims.ExpiresAt.Time.Format(time.RFC3339),
+		time.Now().Format(time.RFC3339),
+	)
 	}
 
 	return claims.Login, nil

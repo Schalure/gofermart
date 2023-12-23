@@ -114,10 +114,30 @@ func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage
 	return orders, nil
 }
 
-func (s *Storage) UpdateOrder(ctx context.Context, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error {
+func (s *Storage) UpdateOrder(ctx context.Context, userLogin string, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error {
 
-	_, err := s.db.Exec(ctx, `UPDATE orders SET (order_status, bonus_points) VALUES($1, $2) WHERE order_number = $3;`, orderStatus, orderPoints, orderNumber);
-	return err
+	tx, err := s.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	_, err = tx.Exec(ctx,
+		`UPDATE orders SET order_status = $1, bonus_points = $2 WHERE order_number = $3;`,
+		orderStatus, orderPoints, orderNumber);
+	if err != nil {
+		return err
+	}
+
+	if orderPoints > 0 {
+		if _, err = tx.Exec(ctx,
+			`UPDATE users SET loyalty_points = loyalty_points + $1 WHERE login = $2;`,
+			orderPoints, userLogin,
+		); err != nil {
+			return err
+		}
+	}
+	return tx.Commit(ctx)
 }
 
 func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error) {
@@ -153,7 +173,7 @@ func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string
 	defer tx.Rollback(ctx)
 
 	if _, err = tx.Exec(ctx,
-		`UPDATE users SET bonus_points = bonus_points - $1, uploaded_bonus = uploaded_bonus + $2
+		`UPDATE users SET loyalty_points = loyalty_points - $1, withdrawn_points = withdrawn_points + $2
 		WHERE login = (SELECT login FROM orders WHERE order_number = $3);`,
 		sum, sum, orderNumber,
 	); err != nil {
@@ -161,7 +181,7 @@ func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string
 	}
 
 	if _, err = tx.Exec(ctx,
-		`UPDATE orders SET (bonus_points = $1, uploaded_bonus = $2) WHERE order_number = $3;`,
+		`UPDATE orders SET bonus_points = $1, uploaded_bonus = $2 WHERE order_number = $3;`,
 		sum, uploadedAt, orderNumber,
 	); err != nil {
 		return err

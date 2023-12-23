@@ -50,7 +50,7 @@ func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage
 	panic("no implemented: func (s *Storage) GetOrdersByLogin(ctx context.Context, login string) ([]storage.Order, error)")
 }
 
-func (s *Storage) UpdateOrder(ctx context.Context, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error {
+func (s *Storage) UpdateOrder(ctx context.Context, userLogin string, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error {
 
 	panic("no implemented: func (s *Storage) UpdateOrder(ctx context.Context, orderNumber string, orderStatus storage.OrderStatus, orderPoints float64) error")
 }

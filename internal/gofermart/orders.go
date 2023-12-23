@@ -94,13 +94,15 @@ func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Orde
 
 func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 
+	pc := "func (g *Gofermart) orderCheckWorker(ctx context.Context)"
 	//	1.	get orders to check from database
 	ctxGetOrders, cancelGetOrders := context.WithTimeout(ctx, time.Second * 5)
 	orders, err := g.storager.GetOrdersToUpdateStatus(ctxGetOrders)
 	cancelGetOrders()
 	if err != nil {
 		g.loggerer.Debugw(
-			"orderCheckWorker err with read database",
+			pc,
+			"message", "orderCheckWorker err with read database",
 			"err", err,
 		)
 		return
@@ -128,8 +130,19 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 			close(resultCh)
 			return
 		case status := <- resultCh:
+			g.loggerer.Debugw(
+				pc,
+				"message", "return status from resultCh",
+				"status", status,
+			)
 			if status == http.StatusTooManyRequests {
-				t := time.NewTimer(time.Second * 60)
+				g.loggerer.Debugw(
+					pc,
+					"message", "stop orderCheckWorker",
+					"status", status,
+				)
+
+				t := time.NewTimer(time.Second * 5)
 				select {
 				case <-ctx.Done():
 					g.doneCh <- struct{}{}
@@ -139,6 +152,10 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 					close(resultCh)
 					return
 				case <-t.C:
+					g.loggerer.Debugw(
+						pc,
+						"message", "start orderCheckWorker",
+					)
 				}
 			}
 		}
@@ -160,18 +177,35 @@ func (g *Gofermart) worker(ctx context.Context, workerID int, resultCh chan<- in
 		res, status := g.orderChecker.OrderCheck(ctx1, order.OrderNumber)
 		cancel1()
 
-		if status == http.StatusOK && res.OrderStatus != order.OrderStatus {
-			ctx2, cancel2 := context.WithTimeout(ctx, time.Second)
-			cancel2()
-			err := g.storager.UpdateOrder(ctx2, res.OrderNumber, res.OrderStatus, res.BonusPoints)
-			if err != nil {
+		g.loggerer.Debugw(
+			pc,
+			"message", "return order from OrderCheck",
+			"order", res,
+			"status", status,
+		)
+
+		if status == http.StatusOK {
+
+			if res.OrderStatus != order.OrderStatus {
+				ctx2, cancel2 := context.WithTimeout(ctx, time.Second)
+				err := g.storager.UpdateOrder(ctx2, order.UserLogin, order.OrderNumber, res.OrderStatus, res.BonusPoints)
+				cancel2()
+				if err != nil {
+					g.loggerer.Debugw(
+						pc,
+						"message", "can't update storage",
+						"err", err,
+					)			
+					g.wg.Add(1)
+					go g.addToInputCh(order)
+					continue
+				}
+			}
+			if res.OrderStatus == storage.OrderStatusNew || res.OrderStatus == storage.OrderStatusProcessing {
 				g.wg.Add(1)
 				go g.addToInputCh(order)
-				continue
 			}
-		}
-
-		if res.OrderStatus == storage.OrderStatusNew || res.OrderStatus == storage.OrderStatusProcessing {
+		} else {
 			g.wg.Add(1)
 			go g.addToInputCh(order)
 		}
@@ -190,13 +224,15 @@ func (g *Gofermart) worker(ctx context.Context, workerID int, resultCh chan<- in
 //	Add order to input channel
 func (g *Gofermart) addToInputCh(order storage.Order) {
 
+	pc := "func (g *Gofermart) addToInputCh(order storage.Order)"
 	defer g.wg.Done()
 	select {
 	case <- g.doneCh:
 		return
 	case g.inputCh <- order:
 		g.loggerer.Debugw(
-			"add order to inputCh",
+			pc,
+			"message", "add order to inputCh",
 			"order number", order.OrderNumber,
 		)
 	}
