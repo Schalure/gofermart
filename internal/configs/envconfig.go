@@ -59,13 +59,13 @@ func (c *EnvConfig) parseFlags() {
 		c.ServiceHost = serviceHost
 	}
 
-	if isValidHostAddres(dbHost) {
+	//if isValidHostAddres(dbHost) {
 		c.DBHost = dbHost
-	}
+	//}
 
-	if isValidHostAddres(accrualHost) {
+	//if isValidHostAddres(accrualHost) {
 		c.AccrualHost = accrualHost
-	}
+	//}
 
 	if appConfigFilePath != "" {
 		c.AppConfigFilePath = appConfigFilePath
@@ -92,12 +92,12 @@ func (c *EnvConfig) parseEnvironmental() {
 	}
 
 	if accrualHost, ok := os.LookupEnv(envNameAccrualHost); ok {
-		if isValidHostAddres(accrualHost) {
+		//if isValidHostAddres(accrualHost) {
 			c.AccrualHost = accrualHost
 		} else {
 			log.Printf("Using value by default. %s: accrualHost value is not valid: %s", pc, accrualHost)
 		}
-	}
+	//}
 
 	if appConfigFilePath, ok := os.LookupEnv(envAppConfigFilePath); ok {
 		if appConfigFilePath != "" {
