@@ -1,8 +1,10 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
 	"net/http"
 	"time"
 
@@ -120,11 +122,16 @@ func (m *Middleware) WithLogging(h http.Handler) http.Handler {
 			responseData:   responseData,
 		}
 
+		buf, _ := io.ReadAll(r.Body)
+		rdr1 := io.NopCloser(bytes.NewBuffer(buf))	
+		r.Body = rdr1
+
 		m.logger.Infow("Information about request",
 			"Request URI", r.RequestURI,
 			"Request method", r.Method,
 			"Request headers", r.Header,
 			"Request cookie", r.Cookies(),
+			"Request body", string(buf),
 		)
 
 		start := time.Now()
