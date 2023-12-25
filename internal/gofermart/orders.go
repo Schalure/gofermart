@@ -13,8 +13,8 @@ import (
 	"github.com/jackc/pgx/pgtype"
 )
 
-const RepetitiveCheckTime = 0//time.Second * 5
-const SleepCheckTime = 0//time.Second * 60
+const RepetitiveCheckTime = time.Second * 2
+const SleepCheckTime = time.Second * 60
 
 var count int
 
