@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"flag"
 	"log"
 	"net"
 	"os"
@@ -37,39 +38,39 @@ func newEnvConfig() *EnvConfig {
 		AppConfigFilePath: defaultAppConfigFilePath,
 	}
 
-//	envConfig.parseFlags()
-//	envConfig.parseEnvironmental()
+	envConfig.parseFlags()
+	envConfig.parseEnvironmental()
 
 	return &envConfig
 }
 
 // Parse application flags
-// func (c *EnvConfig) parseFlags() {
+func (c *EnvConfig) parseFlags() {
 
 
-// 	serviceHost := *flag.String("a", "", "Service host addres. Example: 127.0.0.1:8080")
-// 	dbHost := *flag.String("d", "", "Database host addres. Example: 127.0.0.1:8080")
-// 	accrualHost := *flag.String("r", "", "Accrual system address. Example: 127.0.0.1:8080")
-// 	appConfigFilePath := *flag.String("c", "", "Application configuration file path")
+	serviceHost := *flag.String("a", "", "Service host addres. Example: 127.0.0.1:8080")
+	dbHost := *flag.String("d", "", "Database host addres. Example: 127.0.0.1:8080")
+	accrualHost := *flag.String("r", "", "Accrual system address. Example: 127.0.0.1:8080")
+	appConfigFilePath := *flag.String("c", "", "Application configuration file path")
 
-// 	flag.Parse()
+	flag.Parse()
 
-// 	if isValidHostAddres(serviceHost) {
-// 		c.ServiceHost = serviceHost
-// 	}
+	if isValidHostAddres(serviceHost) {
+		c.ServiceHost = serviceHost
+	}
 
-// 	//if isValidHostAddres(dbHost) {
-// 		c.DBHost = dbHost
-// 	//}
+	//if isValidHostAddres(dbHost) {
+		c.DBHost = dbHost
+	//}
 
-// 	//if isValidHostAddres(accrualHost) {
-// 		c.AccrualHost = accrualHost
-// 	//}
+	//if isValidHostAddres(accrualHost) {
+		c.AccrualHost = accrualHost
+	//}
 
-// 	if appConfigFilePath != "" {
-// 		c.AppConfigFilePath = appConfigFilePath
-// 	}
-// }
+	if appConfigFilePath != "" {
+		c.AppConfigFilePath = appConfigFilePath
+	}
+}
 
 // Parse environmental variables
 func (c *EnvConfig) parseEnvironmental() {
