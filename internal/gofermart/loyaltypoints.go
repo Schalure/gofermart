@@ -25,10 +25,26 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 	order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)
 	cancel1()
 	if err != nil {
+		g.loggerer.Infow(
+			pc,
+			"ААААААААААААА", "ААААААААААААА",
+			"func", "order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)",
+			"message", "order number is not valid",
+			"orderNumber", orderNumber,
+			"error", err,
+		)
 		return gofermaterrors.ErrInvalidOrderNumber
 	}
 
 	if order.UserLogin != login {
+		g.loggerer.Infow(
+			pc,
+			"ААААААААААААА", "ААААААААААААА",
+			"func", "if order.UserLogin != login",
+			"message", "order number is not valid",
+			"order.UserLogin", order.UserLogin,
+			"login", login,
+		)
 		return gofermaterrors.ErrInvalidOrderNumber
 	}
 
