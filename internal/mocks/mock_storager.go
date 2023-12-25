@@ -168,15 +168,15 @@ func (mr *MockStoragerMockRecorder) UpdateOrder(arg0, arg1, arg2, arg3, arg4 int
 }
 
 // WithdrawPointsForOrder mocks base method.
-func (m *MockStorager) WithdrawPointsForOrder(arg0 context.Context, arg1 string, arg2 float64, arg3 time.Time) error {
+func (m *MockStorager) WithdrawPointsForOrder(arg0 context.Context, arg1, arg2 string, arg3 float64, arg4 time.Time) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WithdrawPointsForOrder", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "WithdrawPointsForOrder", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // WithdrawPointsForOrder indicates an expected call of WithdrawPointsForOrder.
-func (mr *MockStoragerMockRecorder) WithdrawPointsForOrder(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *MockStoragerMockRecorder) WithdrawPointsForOrder(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithdrawPointsForOrder", reflect.TypeOf((*MockStorager)(nil).WithdrawPointsForOrder), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithdrawPointsForOrder", reflect.TypeOf((*MockStorager)(nil).WithdrawPointsForOrder), arg0, arg1, arg2, arg3, arg4)
 }

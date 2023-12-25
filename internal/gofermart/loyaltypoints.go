@@ -22,37 +22,29 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 	}
 
 	ctx1, cancel1 := context.WithTimeout(ctx, time.Second*5)
+	defer cancel1()
 	order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)
-	cancel1()
-	if err != nil {
+	if err == nil {
 		g.loggerer.Infow(
 			pc,
-			"ААААААААААААА", "ААААААААААААА",
-			"func", "order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)",
-			"message", "order number is not valid",
+			"message", "can't get order by number",
 			"orderNumber", orderNumber,
 			"error", err,
 		)
-		return gofermaterrors.ErrInvalidOrderNumber
-	}
-
-	if order.UserLogin != login {
-		g.loggerer.Infow(
-			pc,
-			"ААААААААААААА", "ААААААААААААА",
-			"func", "if order.UserLogin != login",
-			"message", "order number is not valid",
-			"order.UserLogin", order.UserLogin,
-			"login", login,
-		)
-		return gofermaterrors.ErrInvalidOrderNumber
+		if order.UserLogin == login {
+			return gofermaterrors.ErrDublicateOrderNumberByUser
+		}
+		if order.UserLogin != login {
+			return gofermaterrors.ErrDublicateOrderNumber
+		}
+		return gofermaterrors.ErrInternal
 	}
 
 	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)
 	user, err := g.storager.GetUserByLogin(ctx2, login)
 	cancel2()
 	if err != nil {
-		return err
+		return gofermaterrors.ErrInternal
 	}
 
 	if user.LoyaltyPoints < sum {
@@ -63,7 +55,7 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 	user.WithdrawnPoints += sum
 
 	ctx3, cancel3 := context.WithTimeout(ctx, time.Second*5)
-	err = g.storager.WithdrawPointsForOrder(ctx3, orderNumber, sum, time.Now())
+	err = g.storager.WithdrawPointsForOrder(ctx3, login, orderNumber, sum, time.Now())
 	cancel3()
 	if err != nil {
 		return gofermaterrors.ErrInternal

@@ -165,7 +165,7 @@ func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order,
 	return orders, nil
 }
 
-func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64, uploadedAt time.Time) error {
+func (s *Storage) WithdrawPointsForOrder(ctx context.Context, login string, orderNumber string, sum float64, uploadedAt time.Time) error {
 
 	tx, err := s.db.Begin(ctx)
 	if err != nil {
@@ -175,15 +175,16 @@ func (s *Storage) WithdrawPointsForOrder(ctx context.Context, orderNumber string
 
 	if _, err = tx.Exec(ctx,
 		`UPDATE users SET loyalty_points = loyalty_points - $1, withdrawn_points = withdrawn_points + $2
-		WHERE login = (SELECT login FROM orders WHERE order_number = $3);`,
-		sum, sum, orderNumber,
+		WHERE login = $3;`,
+		sum, sum, login,
 	); err != nil {
 		return err
 	}
 
 	if _, err = tx.Exec(ctx,
-		`UPDATE orders SET bonus_withdraw = $1, uploaded_bonus = $2 WHERE order_number = $3;`,
-		sum, uploadedAt, orderNumber,
+		`INSERT INTO orders (order_number, order_status, uploaded_order, uploaded_bonus, bonus_withdraw, login) VALUES($1, $2, $3, $4, $5, $6);`,
+		orderNumber, storage.OrderStatusProcessed, time.Now().Format(time.RFC3339),
+		time.Now().Format(time.RFC3339), sum, login,
 	); err != nil {
 		return err
 	}
