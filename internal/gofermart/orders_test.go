@@ -65,6 +65,11 @@ func Test_isOrderValid(t *testing.T) {
 			name:      "bad seq test",
 			inpString: "4561261212%45467",
 			want:      false,
+		},	
+		{
+			name:      "autotests order test",
+			inpString: "57470721358",
+			want:      true,
 		},
 	}
 

@@ -39,6 +39,7 @@ func main() {
 	log.Println("Service initializing...")
 
 	orderChecker := loyaltysystem.NewLoyaltySystem(config.EnvConfig.AccrualHost)
+//	orderChecker := loyaltysystem.NewMockLoyaltySystem()
 	service := gofermart.NewGofermart(
 		storage,
 		logger,

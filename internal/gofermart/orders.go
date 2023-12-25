@@ -12,6 +12,9 @@ import (
 	"github.com/jackc/pgx/pgtype"
 )
 
+const RepetitiveCheckTime = time.Second * 5
+const SleepCheckTime = time.Second * 60
+
 // Add new order to system
 func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) error {
 
@@ -46,9 +49,9 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 	}
 
 	order = storage.Order{
-		OrderNumber: orderNumber,
-		UserLogin:   login,
-		OrderStatus: storage.OrderStatusNew,
+		OrderNumber:   orderNumber,
+		UserLogin:     login,
+		OrderStatus:   storage.OrderStatusNew,
 		UploadedOrder: pgtype.Timestamptz{Time: time.Now()},
 	}
 
@@ -67,7 +70,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 	}
 
 	g.wg.Add(1)
-	go g.addToInputCh(order)
+	go g.addToInputCh(order, 0)
 
 	return nil
 }
@@ -94,15 +97,12 @@ func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Orde
 
 func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 
-	pc := "func (g *Gofermart) orderCheckWorker(ctx context.Context)"
 	//	1.	get orders to check from database
-	ctxGetOrders, cancelGetOrders := context.WithTimeout(ctx, time.Second * 5)
+	ctxGetOrders, cancelGetOrders := context.WithTimeout(ctx, time.Second*5)
 	orders, err := g.storager.GetOrdersToUpdateStatus(ctxGetOrders)
 	cancelGetOrders()
 	if err != nil {
-		g.loggerer.Debugw(
-			pc,
-			"message", "orderCheckWorker err with read database",
+		g.loggerer.Debugw("orderCheckWorker err with read database",
 			"err", err,
 		)
 		return
@@ -110,129 +110,133 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 
 	for _, order := range orders {
 		g.wg.Add(1)
-		go g.addToInputCh(order)
+		go g.addToInputCh(order, 0)
 	}
 
 	//	2.	run workers
 	resultCh := make(chan int)
+	pauseSignalCh := make(chan struct{}, numWorkers)
 	for i := 0; i < numWorkers; i++ {
-		go g.worker(ctx, i, resultCh)
+		go g.worker(ctx, i, resultCh, pauseSignalCh)
 	}
 
+	g.loggerer.Debugw("orderCheckWorker start",)
 	//	3.	run orderCheckWorker task
 	for {
 		select {
 		case <-ctx.Done():
 			g.doneCh <- struct{}{}
 			close(g.doneCh)
+			g.loggerer.Debugw("closed g.doneCh")
 			g.wg.Wait()
 			close(g.inputCh)
+			g.loggerer.Debugw("closed g.inputCh")
 			close(resultCh)
+			g.loggerer.Debugw("closed resultCh")
+			close(pauseSignalCh)
+			g.loggerer.Debugw("closed pauseSignalCh")
+
 			return
-		case status := <- resultCh:
-			g.loggerer.Debugw(
-				pc,
-				"message", "return status from resultCh",
+		case status := <-resultCh:
+			g.loggerer.Debugw("return status from resultCh",
 				"status", status,
 			)
 			if status == http.StatusTooManyRequests {
-				g.loggerer.Debugw(
-					pc,
-					"message", "stop orderCheckWorker",
-					"status", status,
-				)
-
-				t := time.NewTimer(time.Second * 5)
-				select {
-				case <-ctx.Done():
-					g.doneCh <- struct{}{}
-					close(g.doneCh)
-					g.wg.Wait()
-					close(g.inputCh)
-					close(resultCh)
-					return
-				case <-t.C:
-					g.loggerer.Debugw(
-						pc,
-						"message", "start orderCheckWorker",
-					)
+				g.loggerer.Debugw("paused orderCheckWorker")
+				for i := 0; i < numWorkers; i++ {
+					pauseSignalCh <- struct{}{}
 				}
 			}
 		}
 	}
 }
 
-func (g *Gofermart) worker(ctx context.Context, workerID int, resultCh chan<- int) {
-	
-	pc := "func (g *Gofermart) worker(ctx context.Context, chanID int, resultCh chan<- int)"
+func (g *Gofermart) worker(ctx context.Context, workerID int, resultCh chan<- int, pauseSignalCh chan struct{}) {
 
-	for order := range g.inputCh {
-		g.loggerer.Debugw(
-			pc,
-			"message", "start processing order",
-			"workerId", workerID,
-			"order", order.String(),
-		)
-		ctx1, cancel1 := context.WithTimeout(ctx, time.Second)
-		res, status := g.orderChecker.OrderCheck(ctx1, order.OrderNumber)
-		cancel1()
+	for {
+		select {
+		case <-ctx.Done():
+			g.loggerer.Debugw("stop worker by context",
+				"workerId", workerID,
+			)
+			return
+		case <-pauseSignalCh:
+			g.loggerer.Debugw("paused worker number",
+				"workerID", workerID,
+			)
+			time.Sleep(SleepCheckTime)
+		case order := <-g.inputCh:
+			g.loggerer.Debugw("start processing order",
+				"workerId", workerID,
+				"order number", order.OrderNumber,
+				"order status", order.OrderStatus,
+			)
+			ctx1, cancel1 := context.WithTimeout(ctx, time.Second)
+			res, status := g.orderChecker.OrderCheck(ctx1, order.OrderNumber)
+			cancel1()
+			g.loggerer.Debugw("return order from OrderCheck",
+				"workerId", workerID,
+				"order number", res.OrderNumber,
+				"order status", res.OrderStatus,
+				"status", status,
+			)
 
-		g.loggerer.Debugw(
-			pc,
-			"message", "return order from OrderCheck",
-			"order", res,
-			"status", status,
-		)
+			if status != http.StatusOK {
+				g.wg.Add(1)
+				go g.addToInputCh(order, RepetitiveCheckTime)
+				resultCh <- status
+				break
+			}
 
-		if status == http.StatusOK {
+			if res.OrderStatus == storage.OrderStatusNew || res.OrderStatus == storage.OrderStatusProcessing {
+				g.wg.Add(1)
+				go g.addToInputCh(order, RepetitiveCheckTime)
+				resultCh <- status
+				break
+			}
 
 			if res.OrderStatus != order.OrderStatus {
 				ctx2, cancel2 := context.WithTimeout(ctx, time.Second)
 				err := g.storager.UpdateOrder(ctx2, order.UserLogin, order.OrderNumber, res.OrderStatus, res.BonusPoints)
 				cancel2()
 				if err != nil {
-					g.loggerer.Debugw(
-						pc,
-						"message", "can't update storage",
-						"err", err,
-					)			
+					g.loggerer.Debugw("can't update order status in database",
+						"workerId", workerID,
+						"order number", res.OrderNumber,
+						"order status", res.OrderStatus,
+						"error", err,
+					)
 					g.wg.Add(1)
-					go g.addToInputCh(order)
-					continue
+					go g.addToInputCh(order, RepetitiveCheckTime)
+					resultCh <- status
+					break
 				}
-			}
-			if res.OrderStatus == storage.OrderStatusNew || res.OrderStatus == storage.OrderStatusProcessing {
-				g.wg.Add(1)
-				go g.addToInputCh(order)
-			}
-		} else {
-			g.wg.Add(1)
-			go g.addToInputCh(order)
-		}
 
-		resultCh <- status
-		g.loggerer.Debugw(
-			pc,
-			"message", "finish processing order",
-			"workerId", workerID,
-			"order", order.String(),
-			"status", status,
-		)
+
+				resultCh <- status
+				g.loggerer.Debugw("finished processing order successful",
+					"workerId", workerID,
+					"order number", res.OrderNumber,
+					"order status", res.OrderStatus,
+					"accrual", res.BonusPoints,
+					"status", status,
+				)
+			}
+		}
 	}
 }
 
-//	Add order to input channel
-func (g *Gofermart) addToInputCh(order storage.Order) {
+// Add order to input channel
+func (g *Gofermart) addToInputCh(order storage.Order, waitTime time.Duration) {
 
-	pc := "func (g *Gofermart) addToInputCh(order storage.Order)"
+	time.Sleep(waitTime)
+
 	defer g.wg.Done()
 	select {
-	case <- g.doneCh:
+	case <-g.doneCh:
 		return
 	case g.inputCh <- order:
-		g.loggerer.Debugw(
-			pc,
-			"message", "add order to inputCh",
+		g.loggerer.Debugw("add order to inputCh",
 			"order number", order.OrderNumber,
 		)
 	}
@@ -261,10 +265,14 @@ func (g *Gofermart) isOrderValid(orderNumber string) bool {
 // Checking by the Luna algorithm
 func LunaAlgorithm(data []int) bool {
 
+	var res int
 	const k = 9
 	dataLenght := len(data)
 	startNum := dataLenght % 2
-	res := 0
+
+	if startNum != 0 {
+		res += data[0]
+	}
 
 	for ; startNum < dataLenght-1; startNum += 2 {
 		data[startNum] *= 2
@@ -276,3 +284,6 @@ func LunaAlgorithm(data []int) bool {
 
 	return res%10 == 0
 }
+
+//	5 7 4 7 0 7 2 1 3 5 8
+//	5 5 4 5 0 5 2 2 3 1
