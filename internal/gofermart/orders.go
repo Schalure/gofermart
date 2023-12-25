@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
@@ -12,8 +13,10 @@ import (
 	"github.com/jackc/pgx/pgtype"
 )
 
-const RepetitiveCheckTime = time.Second * 5
-const SleepCheckTime = time.Second * 60
+const RepetitiveCheckTime = 0//time.Second * 5
+const SleepCheckTime = 0//time.Second * 60
+
+var count int
 
 // Add new order to system
 func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) error {
@@ -97,6 +100,9 @@ func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Orde
 
 func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 
+	var wgWait sync.WaitGroup
+	defer wgWait.Wait()
+
 	//	1.	get orders to check from database
 	ctxGetOrders, cancelGetOrders := context.WithTimeout(ctx, time.Second*5)
 	orders, err := g.storager.GetOrdersToUpdateStatus(ctxGetOrders)
@@ -117,7 +123,8 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 	resultCh := make(chan int)
 	pauseSignalCh := make(chan struct{}, numWorkers)
 	for i := 0; i < numWorkers; i++ {
-		go g.worker(ctx, i, resultCh, pauseSignalCh)
+		wgWait.Add(1)
+		go g.worker(ctx, &wgWait, i, resultCh, pauseSignalCh)
 	}
 
 	g.loggerer.Debugw("orderCheckWorker start",)
@@ -125,6 +132,7 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
+			g.loggerer.Debugw("количество запущеных горутин", "count", count)
 			g.doneCh <- struct{}{}
 			close(g.doneCh)
 			g.loggerer.Debugw("closed g.doneCh")
@@ -135,7 +143,6 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 			g.loggerer.Debugw("closed resultCh")
 			close(pauseSignalCh)
 			g.loggerer.Debugw("closed pauseSignalCh")
-
 			return
 		case status := <-resultCh:
 			g.loggerer.Debugw("return status from resultCh",
@@ -151,7 +158,9 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 	}
 }
 
-func (g *Gofermart) worker(ctx context.Context, workerID int, resultCh chan<- int, pauseSignalCh chan struct{}) {
+func (g *Gofermart) worker(ctx context.Context, wgWait *sync.WaitGroup, workerID int, resultCh chan<- int, pauseSignalCh chan struct{}) {
+
+	defer wgWait.Done()
 
 	for {
 		select {
@@ -230,8 +239,13 @@ func (g *Gofermart) worker(ctx context.Context, workerID int, resultCh chan<- in
 func (g *Gofermart) addToInputCh(order storage.Order, waitTime time.Duration) {
 
 	time.Sleep(waitTime)
+	count++
 
-	defer g.wg.Done()
+	defer func() {
+		g.wg.Done()
+		count--
+	}()
+
 	select {
 	case <-g.doneCh:
 		return

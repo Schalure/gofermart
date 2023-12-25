@@ -31,7 +31,7 @@ func Test_GetBalance(t *testing.T) {
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
 	server := NewServer(NewHandler(userManager, orderManager, loyaltySystemManager), NewMidleware(logger, tokenCheker))
 
-	testServer := httptest.NewServer(server.router)
+	testServer := httptest.NewServer(server.Router)
 	defer testServer.Close()
 
 	testCases := []struct {
@@ -108,7 +108,7 @@ func Test_WithdrawLoyaltyPoints(t *testing.T) {
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
 	server := NewServer(NewHandler(userManager, orderManager, loyaltySystemManager), NewMidleware(logger, tokenCheker))
 
-	testServer := httptest.NewServer(server.router)
+	testServer := httptest.NewServer(server.Router)
 	defer testServer.Close()
 
 	testCases := []struct {
@@ -177,7 +177,7 @@ func Test_GetOrdersWithdrawals(t *testing.T) {
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
 	server := NewServer(NewHandler(userManager, orderManager, loyaltySystemManager), NewMidleware(logger, tokenCheker))
 
-	testServer := httptest.NewServer(server.router)
+	testServer := httptest.NewServer(server.Router)
 	defer testServer.Close()
 
 	testCases := []struct {

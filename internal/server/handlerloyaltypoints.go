@@ -44,6 +44,7 @@ func (h *Handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+//	POST /api/user/balance/withdraw
 func (h *Handler) WithdrawLoyaltyPoints(w http.ResponseWriter, r *http.Request) {
 
 	type Order struct {

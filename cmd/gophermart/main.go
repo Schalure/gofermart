@@ -3,8 +3,7 @@ package main
 import (
 	"context"
 	"log"
-	"os/signal"
-	"syscall"
+	"net/http"
 
 	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/gofermart"
@@ -18,8 +17,7 @@ func main() {
 
 	log.Println("Starting application initialization...")
 
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+	ctx, cancel := context.WithCancel(context.Background())
 
 	log.Println("Config initializing...")
 	config, err := configs.NewConfig()
@@ -38,8 +36,8 @@ func main() {
 
 	log.Println("Service initializing...")
 
-	orderChecker := loyaltysystem.NewLoyaltySystem(config.EnvConfig.AccrualHost)
-//	orderChecker := loyaltysystem.NewMockLoyaltySystem()
+//	orderChecker := loyaltysystem.NewLoyaltySystem(config.EnvConfig.AccrualHost)
+	orderChecker := loyaltysystem.NewMockLoyaltySystem()
 	service := gofermart.NewGofermart(
 		storage,
 		logger,
@@ -60,6 +58,15 @@ func main() {
 
 	log.Println("Gofermart service have been started...")
 
-	err = server.Run(config.EnvConfig.ServiceHost)
-	server.Stop(err)
+	// go func() {
+	// 	exit := make(chan os.Signal, 1)
+	// 	signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
+	// 	<-exit
+	// }()	
+
+
+	err = http.ListenAndServe(config.EnvConfig.ServiceHost, server.Router)
+	//err = server.Run(config.EnvConfig.ServiceHost)
+	log.Println("Gofermart service stop:", err)
+		cancel()
 }

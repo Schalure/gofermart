@@ -72,7 +72,7 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 
 		orderChecker: orderChecker,
 
-		doneCh: make(chan struct{}),
+		doneCh: make(chan struct{}, 1),
 		inputCh: make(chan storage.Order),
 
 		validLogin:       validLogin,

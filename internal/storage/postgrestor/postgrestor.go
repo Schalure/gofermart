@@ -195,7 +195,7 @@ func (s *Storage) GetPointWithdraws(ctx context.Context, login string) ([]storag
 	orders := make([]storage.Order, 0)
 
 	rows, err := s.db.Query(ctx,
-		`SELECT * FROM orders WHERE login = $1 ORDER BY uploaded_bonus DESC;`,
+		`SELECT * FROM orders WHERE login = $1 AND bonus_withdraw != 0 ORDER BY uploaded_bonus DESC;`,
 		login,
 	)
 	if err != nil {

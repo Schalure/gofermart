@@ -7,7 +7,7 @@ import (
 )
 
 type Server struct {
-	router *chi.Mux
+	Router *chi.Mux
 }
 
 func NewServer(handler *Handler, midleware *Middleware) *Server {
@@ -28,13 +28,13 @@ func NewServer(handler *Handler, midleware *Middleware) *Server {
 	})
 
 	return &Server{
-		router: r,
+		Router: r,
 	}
 }
 
 func (s *Server) Run(host string) error {
 
-	return http.ListenAndServe(host, s.router)
+	return http.ListenAndServe(host, s.Router)
 }
 
 func (s *Server) Stop(err error) {

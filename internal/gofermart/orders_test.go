@@ -38,6 +38,11 @@ func Test_isOrderValid(t *testing.T) {
 		want      bool
 	}{
 		{
+			name:      "autotests order test1",
+			inpString: "308800745180713",
+			want:      true,
+		},
+		{
 			name:      "simple even test",
 			inpString: "4561261212345467",
 			want:      true,

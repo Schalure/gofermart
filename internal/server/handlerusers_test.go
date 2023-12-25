@@ -25,7 +25,7 @@ func Test_UserRegistration(t *testing.T) {
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
 	server := NewServer(NewHandler(mockUserManager, mockOrderManager, loyaltySystemManager), NewMidleware(mockLogger, tokenCheker))
 
-	testServer := httptest.NewServer(server.router)
+	testServer := httptest.NewServer(server.Router)
 	defer testServer.Close()
 
 	testMethod := "POST"
@@ -122,7 +122,7 @@ func Test_UserAuthentication(t *testing.T) {
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
 	server := NewServer(NewHandler(mockUserManager, mockOrderManager, loyaltySystemManager), NewMidleware(mockLogger, tokenCheker))
 
-	testServer := httptest.NewServer(server.router)
+	testServer := httptest.NewServer(server.Router)
 	defer testServer.Close()
 
 	testMethod := "POST"
