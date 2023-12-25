@@ -57,9 +57,18 @@ func (s *LoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) (sto
 		return storage.Order{}, 0
 	}
 
+	var orderStatus storage.OrderStatus
+
+	switch res.Status {
+	case Registered: orderStatus = storage.OrderStatusNew
+	case Invalid: orderStatus = storage.OrderStatusInvalid
+	case Processing: orderStatus = storage.OrderStatusProcessing
+	case Processed: orderStatus = storage.OrderStatusProcessed
+	}
+
 	return storage.Order{
 		OrderNumber: res.Order,
-		OrderStatus: storage.OrderStatus(res.Status),
+		OrderStatus: orderStatus,
 		BonusPoints: res.Accrual,
 	}, resp.StatusCode()
 }

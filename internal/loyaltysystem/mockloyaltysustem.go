@@ -2,8 +2,7 @@ package loyaltysystem
 
 import (
 	"context"
-	"crypto/rand"
-	"math/big"
+	"math/rand"
 
 	"github.com/Schalure/gofermart/internal/storage"
 )
@@ -26,37 +25,21 @@ func (s *MockLoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) 
 	}
 	var res result
 
-	var statusCode int
-	statusCodeBig, err := rand.Int(rand.Reader, big.NewInt(3))
-	if err != nil {
-		panic("OrderCheck")
-	}
-	switch statusCodeBig.Int64() {
-	case 0: statusCode = 200
-	case 1: statusCode = 204
-	case 2: statusCode = 429
-	case 3: statusCode = 500
-	default: panic("OrderCheck")
-	}
+	statusCode := 200
+
 
 	if statusCode == 200 {
-		statusBig, err := rand.Int(rand.Reader, big.NewInt(3))
-		if err != nil {
-			panic("OrderCheck")
-		}
-		switch statusBig.Int64() {
-		case 0: res.Status = "NEW"
-		case 1, 3: res.Status = "PROCESSED"
-		case 2: res.Status = "PROCESSING"
+		statusBig := rand.Intn(2)
+
+		switch statusBig {
+		case 0: res.Status = "PROCESSING"
+		case 1: res.Status = "PROCESSED"
 		default: panic("OrderCheck")
 		}
 
 		if res.Status == "PROCESSED" {
-			bonusPointsBig, err := rand.Int(rand.Reader, big.NewInt(500))
-			if err != nil {
-				panic("OrderCheck")
-			}
-			res.Accrual = float64(bonusPointsBig.Int64())
+			bonusPoints := 100 + rand.Float64() * (500 - 100)
+			res.Accrual = bonusPoints
 		}
 	
 	}

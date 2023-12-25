@@ -58,15 +58,7 @@ func main() {
 
 	log.Println("Gofermart service have been started...")
 
-	// go func() {
-	// 	exit := make(chan os.Signal, 1)
-	// 	signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
-	// 	<-exit
-	// }()	
-
-
 	err = http.ListenAndServe(config.EnvConfig.ServiceHost, server.Router)
-	//err = server.Run(config.EnvConfig.ServiceHost)
 	log.Println("Gofermart service stop:", err)
-		cancel()
+	cancel()
 }

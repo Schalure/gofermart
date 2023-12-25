@@ -57,6 +57,7 @@ type Storager interface {
 	GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order, error)
 	WithdrawPointsForOrder(ctx context.Context, orderNumber string, sum float64, uploadedAt time.Time) error
 	GetPointWithdraws(ctx context.Context, login string) ([]storage.Order, error)
+	DeleteOrder(ctx context.Context, orderNumber string) error
 }
 
 // Constructor of gofermart service object

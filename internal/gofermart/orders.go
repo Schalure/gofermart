@@ -190,6 +190,18 @@ func (g *Gofermart) worker(ctx context.Context, wgWait *sync.WaitGroup, workerID
 				"status", status,
 			)
 
+			if status == http.StatusNoContent {
+				ctx3, cancel3 := context.WithTimeout(ctx, time.Second)
+				err := g.storager.DeleteOrder(ctx3, order.OrderNumber)
+				cancel3()
+				if err != nil {
+					go g.addToInputCh(order, RepetitiveCheckTime)
+					resultCh <- status
+				}
+				break
+			}
+
+
 			if status != http.StatusOK {
 				g.wg.Add(1)
 				go g.addToInputCh(order, RepetitiveCheckTime)
@@ -197,40 +209,27 @@ func (g *Gofermart) worker(ctx context.Context, wgWait *sync.WaitGroup, workerID
 				break
 			}
 
-			if res.OrderStatus == storage.OrderStatusNew || res.OrderStatus == storage.OrderStatusProcessing {
+			order.OrderStatus = res.OrderStatus
+			order.BonusPoints = res.BonusPoints
+
+			ctx2, cancel2 := context.WithTimeout(ctx, time.Second)
+			err := g.storager.UpdateOrder(ctx2, order.UserLogin, order.OrderNumber, order.OrderStatus, order.BonusPoints)
+			cancel2()
+			if err != nil || order.OrderStatus == storage.OrderStatusNew || order.OrderStatus == storage.OrderStatusProcessing {
 				g.wg.Add(1)
 				go g.addToInputCh(order, RepetitiveCheckTime)
 				resultCh <- status
 				break
 			}
 
-			if res.OrderStatus != order.OrderStatus {
-				ctx2, cancel2 := context.WithTimeout(ctx, time.Second)
-				err := g.storager.UpdateOrder(ctx2, order.UserLogin, order.OrderNumber, res.OrderStatus, res.BonusPoints)
-				cancel2()
-				if err != nil {
-					g.loggerer.Debugw("can't update order status in database",
-						"workerId", workerID,
-						"order number", res.OrderNumber,
-						"order status", res.OrderStatus,
-						"error", err,
-					)
-					g.wg.Add(1)
-					go g.addToInputCh(order, RepetitiveCheckTime)
-					resultCh <- status
-					break
-				}
-
-
-				resultCh <- status
-				g.loggerer.Debugw("finished processing order successful",
-					"workerId", workerID,
-					"order number", res.OrderNumber,
-					"order status", res.OrderStatus,
-					"accrual", res.BonusPoints,
-					"status", status,
-				)
-			}
+			resultCh <- status
+			g.loggerer.Debugw("finished processing order successful",
+				"workerId", workerID,
+				"order number", res.OrderNumber,
+				"order status", res.OrderStatus,
+				"accrual", res.BonusPoints,
+				"status", status,
+			)
 		}
 	}
 }

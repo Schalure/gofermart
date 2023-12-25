@@ -70,3 +70,8 @@ func (s *Storage) GetPointWithdraws(ctx context.Context, login string) ([]storag
 	panic("no implemented: func (s *Storage) GetPointWithdraws(ctx context.Context, login string) ([]storage.Order, error)")
 
 }
+
+func (s *Storage) DeleteOrder(ctx context.Context, orderNumber string) error {
+
+	panic("no implemented: func (s *Storage) DeleteOrder(ctx context.Context, orderNumber string) error")
+}

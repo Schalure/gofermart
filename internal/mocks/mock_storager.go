@@ -64,6 +64,20 @@ func (mr *MockStoragerMockRecorder) AddNewUser(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddNewUser", reflect.TypeOf((*MockStorager)(nil).AddNewUser), arg0, arg1)
 }
 
+// DeleteOrder mocks base method.
+func (m *MockStorager) DeleteOrder(arg0 context.Context, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteOrder", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteOrder indicates an expected call of DeleteOrder.
+func (mr *MockStoragerMockRecorder) DeleteOrder(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrder", reflect.TypeOf((*MockStorager)(nil).DeleteOrder), arg0, arg1)
+}
+
 // GetOrderByNumber mocks base method.
 func (m *MockStorager) GetOrderByNumber(arg0 context.Context, arg1 string) (storage.Order, error) {
 	m.ctrl.T.Helper()

@@ -213,3 +213,16 @@ func (s *Storage) GetPointWithdraws(ctx context.Context, login string) ([]storag
 	}
 	return orders, nil
 }
+
+func (s *Storage) DeleteOrder(ctx context.Context, orderNumber string) error {
+
+	_, err := s.db.Exec(ctx,
+		`DELETE FROM orders WHERE order_number = $1;`,
+		orderNumber,
+	)
+	if err != nil {
+		return err
+	}
+	return nil	
+}
+
