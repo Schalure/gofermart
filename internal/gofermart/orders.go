@@ -190,16 +190,16 @@ func (g *Gofermart) worker(ctx context.Context, wgWait *sync.WaitGroup, workerID
 				"status", status,
 			)
 
-			if status == http.StatusNoContent {
-				ctx3, cancel3 := context.WithTimeout(ctx, time.Second)
-				err := g.storager.DeleteOrder(ctx3, order.OrderNumber)
-				cancel3()
-				if err != nil {
-					go g.addToInputCh(order, RepetitiveCheckTime)
-					resultCh <- status
-				}
-				break
-			}
+			// if status == http.StatusNoContent {
+			// 	ctx3, cancel3 := context.WithTimeout(ctx, time.Second)
+			// 	err := g.storager.DeleteOrder(ctx3, order.OrderNumber)
+			// 	cancel3()
+			// 	if err != nil {
+			// 		go g.addToInputCh(order, RepetitiveCheckTime)
+			// 		resultCh <- status
+			// 	}
+			// 	break
+			// }
 
 
 			if status != http.StatusOK {
