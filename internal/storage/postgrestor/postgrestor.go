@@ -65,7 +65,7 @@ func (s *Storage) AddNewUser(ctx context.Context, user storage.User) error {
 
 func (s *Storage) GetUserByLogin(ctx context.Context, login string) (storage.User, error) {
 
-	var  user storage.User
+	var user storage.User
 	row := s.db.QueryRow(ctx, `SELECT * FROM users WHERE login = $1;`, login)
 	err := row.Scan(&user.Login, &user.Password, &user.LoyaltyPoints, &user.WithdrawnPoints)
 	return user, err
@@ -80,7 +80,7 @@ func (s *Storage) AddNewOrder(ctx context.Context, order storage.Order) error {
 	if err != nil {
 		return err
 	}
-	return nil	
+	return nil
 }
 
 func (s *Storage) GetOrderByNumber(ctx context.Context, orderNumber string) (storage.Order, error) {
@@ -125,7 +125,7 @@ func (s *Storage) UpdateOrder(ctx context.Context, userLogin string, orderNumber
 
 	_, err = tx.Exec(ctx,
 		`UPDATE orders SET order_status = $1, bonus_points = $2 WHERE order_number = $3;`,
-		orderStatus, orderPoints, orderNumber);
+		orderStatus, orderPoints, orderNumber)
 	if err != nil {
 		return err
 	}
@@ -156,7 +156,7 @@ func (s *Storage) GetOrdersToUpdateStatus(ctx context.Context) ([]storage.Order,
 
 	for rows.Next() {
 		var o storage.Order
-		err := rows.Scan(&o.OrderNumber, &o.OrderStatus, &o.UploadedOrder, &o.BonusPoints, &o.UploadedBonus, &o.BonusWithdraw,  &o.UserLogin)
+		err := rows.Scan(&o.OrderNumber, &o.OrderStatus, &o.UploadedOrder, &o.BonusPoints, &o.UploadedBonus, &o.BonusWithdraw, &o.UserLogin)
 		if err != nil {
 			return nil, err
 		}
@@ -224,6 +224,5 @@ func (s *Storage) DeleteOrder(ctx context.Context, orderNumber string) error {
 	if err != nil {
 		return err
 	}
-	return nil	
+	return nil
 }
-

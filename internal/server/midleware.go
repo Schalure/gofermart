@@ -64,7 +64,6 @@ func (m *Middleware) WithAuthentication(h http.Handler) http.Handler {
 	})
 }
 
-
 type (
 
 	//	Date from response
@@ -123,7 +122,7 @@ func (m *Middleware) WithLogging(h http.Handler) http.Handler {
 		}
 
 		buf, _ := io.ReadAll(r.Body)
-		rdr1 := io.NopCloser(bytes.NewBuffer(buf))	
+		rdr1 := io.NopCloser(bytes.NewBuffer(buf))
 		r.Body = rdr1
 
 		m.logger.Infow("Information about request",

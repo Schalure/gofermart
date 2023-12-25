@@ -127,7 +127,7 @@ func (g *Gofermart) orderCheckWorker(ctx context.Context) {
 		go g.worker(ctx, &wgWait, i, resultCh, pauseSignalCh)
 	}
 
-	g.loggerer.Debugw("orderCheckWorker start",)
+	g.loggerer.Debugw("orderCheckWorker start")
 	//	3.	run orderCheckWorker task
 	for {
 		select {
@@ -189,18 +189,6 @@ func (g *Gofermart) worker(ctx context.Context, wgWait *sync.WaitGroup, workerID
 				"order status", res.OrderStatus,
 				"status", status,
 			)
-
-			// if status == http.StatusNoContent {
-			// 	ctx3, cancel3 := context.WithTimeout(ctx, time.Second)
-			// 	err := g.storager.DeleteOrder(ctx3, order.OrderNumber)
-			// 	cancel3()
-			// 	if err != nil {
-			// 		go g.addToInputCh(order, RepetitiveCheckTime)
-			// 		resultCh <- status
-			// 	}
-			// 	break
-			// }
-
 
 			if status != http.StatusOK {
 				g.wg.Add(1)
@@ -297,6 +285,3 @@ func LunaAlgorithm(data []int) bool {
 
 	return res%10 == 0
 }
-
-//	5 7 4 7 0 7 2 1 3 5 8
-//	5 5 4 5 0 5 2 2 3 1

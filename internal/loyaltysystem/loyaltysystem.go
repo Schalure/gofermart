@@ -60,10 +60,14 @@ func (s *LoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) (sto
 	var orderStatus storage.OrderStatus
 
 	switch res.Status {
-	case Registered: orderStatus = storage.OrderStatusNew
-	case Invalid: orderStatus = storage.OrderStatusInvalid
-	case Processing: orderStatus = storage.OrderStatusProcessing
-	case Processed: orderStatus = storage.OrderStatusProcessed
+	case Registered:
+		orderStatus = storage.OrderStatusNew
+	case Invalid:
+		orderStatus = storage.OrderStatusInvalid
+	case Processing:
+		orderStatus = storage.OrderStatusProcessing
+	case Processed:
+		orderStatus = storage.OrderStatusProcessed
 	}
 
 	return storage.Order{

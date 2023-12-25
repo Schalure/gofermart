@@ -27,19 +27,19 @@ type OrderStatus string
 
 const (
 	OrderStatusNew        OrderStatus = "NEW"        //	заказ загружен в систему, но не попал в обработку
-	OrderStatusProcessing OrderStatus             = "PROCESSING" //	вознаграждение за заказ рассчитывается
-	OrderStatusInvalid OrderStatus                = "INVALID"    //	система расчёта вознаграждений отказала в расчёте
-	OrderStatusProcessed OrderStatus              = "PROCESSED"  //	данные по заказу проверены и информация о расчёте успешно получена
+	OrderStatusProcessing OrderStatus = "PROCESSING" //	вознаграждение за заказ рассчитывается
+	OrderStatusInvalid    OrderStatus = "INVALID"    //	система расчёта вознаграждений отказала в расчёте
+	OrderStatusProcessed  OrderStatus = "PROCESSED"  //	данные по заказу проверены и информация о расчёте успешно получена
 )
 
 type Order struct {
-	OrderNumber string      `json:"number" db:"order_number"`
-	OrderStatus OrderStatus `json:"status" db:"order_status"`
+	OrderNumber   string             `json:"number" db:"order_number"`
+	OrderStatus   OrderStatus        `json:"status" db:"order_status"`
 	UploadedOrder pgtype.Timestamptz `json:"uploaded_order" db:"uploaded_order"`
-	BonusPoints float64     `json:"accural" db:"bonus_points"`
+	BonusPoints   float64            `json:"accural" db:"bonus_points"`
 	UploadedBonus pgtype.Timestamptz `json:"uploaded_bonus" db:"uploaded_bonus"`
-	BonusWithdraw float64 `json:"bonus_withdraw" db:"bonus_withdraw"`
-	UserLogin   string      `json:"login" db:"user_login"`
+	BonusWithdraw float64            `json:"bonus_withdraw" db:"bonus_withdraw"`
+	UserLogin     string             `json:"login" db:"user_login"`
 }
 
 func (o Order) String() string {

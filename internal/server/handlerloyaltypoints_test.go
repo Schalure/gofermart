@@ -155,7 +155,6 @@ func Test_WithdrawLoyaltyPoints(t *testing.T) {
 			require.NoError(t, err)
 			defer resp.Body.Close()
 
-
 			assert.Equal(t, test.want.statusCode, resp.StatusCode)
 
 		})
@@ -200,9 +199,9 @@ func Test_GetOrdersWithdrawals(t *testing.T) {
 				{
 					OrderNumber: "2377225624",
 					BonusPoints: 500,
-					UploadedBonus:  pgtype.Timestamptz{
+					UploadedBonus: pgtype.Timestamptz{
 						Time: time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
-					},//time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
+					}, //time.Date(2020, 12, 9, 16, 9, 57, 0, time.FixedZone("", 60*60*3)),
 				},
 			},
 			want: struct {

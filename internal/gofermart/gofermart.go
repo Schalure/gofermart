@@ -13,7 +13,7 @@ import (
 const (
 	PasswordMinLenght = 8
 	defaultSecretKey  = `poKdq834nFElq71`
-	numWorkers = 20
+	numWorkers        = 20
 )
 
 // Main service object struct
@@ -23,9 +23,9 @@ type Gofermart struct {
 
 	orderChecker OrderChecker
 
-	doneCh chan struct{}
+	doneCh  chan struct{}
 	inputCh chan storage.Order
-	wg sync.WaitGroup
+	wg      sync.WaitGroup
 
 	validPassword    *regexp.Regexp
 	validLogin       *regexp.Regexp
@@ -73,7 +73,7 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 
 		orderChecker: orderChecker,
 
-		doneCh: make(chan struct{}, 1),
+		doneCh:  make(chan struct{}, 1),
 		inputCh: make(chan storage.Order),
 
 		validLogin:       validLogin,

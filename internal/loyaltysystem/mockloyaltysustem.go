@@ -8,7 +8,6 @@ import (
 )
 
 type MockLoyaltySystem struct {
-
 }
 
 func NewMockLoyaltySystem() *MockLoyaltySystem {
@@ -27,23 +26,25 @@ func (s *MockLoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) 
 
 	statusCode := 200
 
-
 	if statusCode == 200 {
 		statusBig := rand.Intn(2)
 
 		switch statusBig {
-		case 0: res.Status = "PROCESSING"
-		case 1: res.Status = "PROCESSED"
-		default: panic("OrderCheck")
+		case 0:
+			res.Status = "PROCESSING"
+		case 1:
+			res.Status = "PROCESSED"
+		default:
+			panic("OrderCheck")
 		}
 
 		if res.Status == "PROCESSED" {
-			bonusPoints := 100 + rand.Float64() * (500 - 100)
+			bonusPoints := 100 + rand.Float64()*(500-100)
 			res.Accrual = bonusPoints
 		}
-	
+
 	}
-	
+
 	return storage.Order{
 		OrderNumber: ordernumber,
 		OrderStatus: storage.OrderStatus(res.Status),

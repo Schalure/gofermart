@@ -21,29 +21,29 @@ func Test_User(t *testing.T) {
 		_, err := stor.db.Exec(context.Background(), `DROP TABLE orders, users;`)
 		require.NoError(t, err, "can't drop tables")
 	}()
-	
+
 	testCases := []struct {
-		name string
-		user storage.User
-		order storage.Order
+		name        string
+		user        storage.User
+		order       storage.Order
 		updateOrder storage.Order
 	}{
 		{
 			name: "simple test",
 			user: storage.User{
-				Login: "Petya",
+				Login:    "Petya",
 				Password: "12345678",
 			},
 			order: storage.Order{
 				OrderNumber: "1234567897",
 				OrderStatus: storage.OrderStatusNew,
-				UploadedOrder:  pgtype.Timestamptz{
-					Time: time.Date(2020, 12, 10, 15, 12, 1, 0, time.Local),
+				UploadedOrder: pgtype.Timestamptz{
+					Time:   time.Date(2020, 12, 10, 15, 12, 1, 0, time.Local),
 					Status: pgtype.Present,
 				},
-				BonusPoints: 0,
-				UploadedBonus: pgtype.Timestamptz{Status: pgtype.Null,},
-				UserLogin: "Petya",
+				BonusPoints:   0,
+				UploadedBonus: pgtype.Timestamptz{Status: pgtype.Null},
+				UserLogin:     "Petya",
 			},
 			updateOrder: storage.Order{
 				OrderNumber: "1234567897",
@@ -58,7 +58,6 @@ func Test_User(t *testing.T) {
 
 			err := stor.AddNewUser(context.Background(), test.user)
 			require.NoError(t, err, "can't save new user: %s", test.user.String())
-
 
 			user, err := stor.GetUserByLogin(context.Background(), test.user.Login)
 			require.NoError(t, err, "can't get user: %s", test.user.Login)

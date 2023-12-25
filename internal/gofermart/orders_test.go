@@ -9,19 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func Test_orderCheckWorker(t *testing.T) {
-
-// 	mockController := gomock.NewController(t)
-// 	defer mockController.Finish()
-
-// 	stor := mocks.NewMockStorager(mockController)
-// 	logger := mocks.NewMockLoggerer(mockController)
-// 	orderChecker := mocks.NewMockOrderChecker(mockController)
-// 	service := NewGofermart(stor, logger, orderChecker, `[0-9a-zA-Z@._]`, `[0-9a-zA-Z]`, `[0-9]`, time.Hour*1)
-// }
-
-
-
 func Test_isOrderValid(t *testing.T) {
 
 	mockController := gomock.NewController(t)
@@ -70,7 +57,7 @@ func Test_isOrderValid(t *testing.T) {
 			name:      "bad seq test",
 			inpString: "4561261212%45467",
 			want:      false,
-		},	
+		},
 		{
 			name:      "autotests order test",
 			inpString: "57470721358",
