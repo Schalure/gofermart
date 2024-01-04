@@ -2,9 +2,12 @@ package postgrestor
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Schalure/gofermart/internal/storage"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -58,6 +61,12 @@ func (s *Storage) AddNewUser(ctx context.Context, user storage.User) error {
 
 	_, err := s.db.Exec(ctx, `INSERT INTO users (login, password) VALUES($1, $2);`, user.Login, user.Password)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.UniqueViolation {
+				return ErrLoginAlreadyExists
+			}
+		}
 		return err
 	}
 	return nil

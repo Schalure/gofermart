@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Schalure/gofermart/internal/storage"
+	"github.com/Schalure/gofermart/internal/storage/postgrestor"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -24,14 +25,6 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 			"login", login,
 		)
 		return "", ErrInvalidLogin
-	}
-
-	if _, err := g.storager.GetUserByLogin(ctx, login); err == nil {
-		g.loggerer.Debugw(
-			pc,
-			"error", err,
-		)
-		return "", ErrLoginAlreadyTaken
 	}
 
 	if err := g.isPasswordValid(password); err != nil {
@@ -52,6 +45,9 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 			pc,
 			"error", err,
 		)
+		if errors.Is(err, postgrestor.ErrLoginAlreadyExists) {
+			return "", ErrLoginAlreadyTaken
+		}
 		return "", ErrInternal
 	}
 
