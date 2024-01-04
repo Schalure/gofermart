@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Schalure/gofermart/internal/configs"
-	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/loggers"
 	"github.com/Schalure/gofermart/internal/mocks"
 	"github.com/Schalure/gofermart/internal/storage"
@@ -48,7 +47,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.ErrLoginAlreadyTaken,
+				err:          ErrLoginAlreadyTaken,
 				passwordHash: "",
 			},
 		},
@@ -60,7 +59,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.ErrInvalidLogin,
+				err:          ErrInvalidLogin,
 				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
 			},
 		},
@@ -72,7 +71,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.ErrInvalidLogin,
+				err:          ErrInvalidLogin,
 				passwordHash: "e360f368fcca8779da96cba0267a5b2c523afd2909036f643e38fb6cc451163c",
 			},
 		},
@@ -84,7 +83,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.ErrPasswordShort,
+				err:          ErrPasswordShort,
 				passwordHash: "",
 			},
 		},
@@ -96,7 +95,7 @@ func Test_CreateUser(t *testing.T) {
 				err          error
 				passwordHash string
 			}{
-				err:          gofermaterrors.ErrPasswordBad,
+				err:          ErrPasswordBad,
 				passwordHash: "",
 			},
 		},
@@ -159,7 +158,7 @@ func Test_UserAuthentication(t *testing.T) {
 			loginToCheck:    "Sasha",
 			passwordToCheck: "q1w2e3r4",
 			want: struct{ err error }{
-				err: gofermaterrors.ErrInvalidLoginPassword,
+				err: ErrInvalidLoginPassword,
 			},
 		}, {
 			name:            "bad password",
@@ -168,7 +167,7 @@ func Test_UserAuthentication(t *testing.T) {
 			loginToCheck:    "Sasha",
 			passwordToCheck: "",
 			want: struct{ err error }{
-				err: gofermaterrors.ErrInvalidLoginPassword,
+				err: ErrInvalidLoginPassword,
 			},
 		},
 	}

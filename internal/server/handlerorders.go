@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
+	"github.com/Schalure/gofermart/internal/gofermart"
 )
 
 // Order registr handler. POST /api/user/orders
@@ -27,15 +27,15 @@ func (h *Handler) LoadOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = h.orderManager.LoadOrder(r.Context(), login, string(orderNumber)); err != nil {
-		if errors.Is(err, gofermaterrors.ErrInvalidOrderNumber) {
+		if errors.Is(err, gofermart.ErrInvalidOrderNumber) {
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
-		if errors.Is(err, gofermaterrors.ErrDublicateOrderNumberByUser) {
+		if errors.Is(err, gofermart.ErrDublicateOrderNumberByUser) {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		if errors.Is(err, gofermaterrors.ErrDublicateOrderNumber) {
+		if errors.Is(err, gofermart.ErrDublicateOrderNumber) {
 			w.WriteHeader(http.StatusConflict)
 			return
 		}
@@ -64,7 +64,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 
 	orders, err := h.orderManager.GetOrders(r.Context(), login)
 	if err != nil {
-		if errors.Is(err, gofermaterrors.ErrNoData) {
+		if errors.Is(err, gofermart.ErrNoData) {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}

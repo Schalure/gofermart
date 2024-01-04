@@ -1,4 +1,4 @@
-package gofermaterrors
+package gofermart
 
 import "errors"
 

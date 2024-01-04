@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
+	"github.com/Schalure/gofermart/internal/gofermart"
 )
 
 // User autotification type
@@ -31,11 +31,11 @@ func (h *Handler) UserRegistration(response http.ResponseWriter, request *http.R
 	defer cancel()
 	token, err := h.userManager.CreateUser(ctx, authData.Login, authData.Password)
 	if err != nil {
-		if errors.Is(err, gofermaterrors.ErrLoginAlreadyTaken) {
-			http.Error(response, gofermaterrors.ErrLoginAlreadyTaken.Error(), http.StatusConflict)
+		if errors.Is(err, gofermart.ErrLoginAlreadyTaken) {
+			http.Error(response, gofermart.ErrLoginAlreadyTaken.Error(), http.StatusConflict)
 			return
 		}
-		http.Error(response, gofermaterrors.ErrInternal.Error(), http.StatusInternalServerError)
+		http.Error(response, gofermart.ErrInternal.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -59,11 +59,11 @@ func (h *Handler) UserAuthentication(response http.ResponseWriter, request *http
 	defer cancel()
 	token, err := h.userManager.AuthenticationUser(ctx, authData.Login, authData.Password)
 	if err != nil {
-		if errors.Is(err, gofermaterrors.ErrInvalidLoginPassword) {
+		if errors.Is(err, gofermart.ErrInvalidLoginPassword) {
 			http.Error(response, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		http.Error(response, gofermaterrors.ErrInternal.Error(), http.StatusInternalServerError)
+		http.Error(response, gofermart.ErrInternal.Error(), http.StatusInternalServerError)
 	}
 
 	http.SetCookie(response, &http.Cookie{

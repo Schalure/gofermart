@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/storage"
 )
 
@@ -18,7 +17,7 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 			"message", "order number is not valid",
 			"orderNumber", orderNumber,
 		)
-		return gofermaterrors.ErrInvalidOrderNumber
+		return ErrInvalidOrderNumber
 	}
 
 	ctx1, cancel1 := context.WithTimeout(ctx, time.Second*5)
@@ -32,23 +31,23 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 			"error", err,
 		)
 		if order.UserLogin == login {
-			return gofermaterrors.ErrDublicateOrderNumberByUser
+			return ErrDublicateOrderNumberByUser
 		}
 		if order.UserLogin != login {
-			return gofermaterrors.ErrDublicateOrderNumber
+			return ErrDublicateOrderNumber
 		}
-		return gofermaterrors.ErrInternal
+		return ErrInternal
 	}
 
 	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)
 	user, err := g.storager.GetUserByLogin(ctx2, login)
 	cancel2()
 	if err != nil {
-		return gofermaterrors.ErrInternal
+		return ErrInternal
 	}
 
 	if user.LoyaltyPoints < sum {
-		return gofermaterrors.ErrInsufficientFunds
+		return ErrInsufficientFunds
 	}
 
 	user.LoyaltyPoints -= sum
@@ -58,7 +57,7 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 	err = g.storager.WithdrawPointsForOrder(ctx3, login, orderNumber, sum, time.Now())
 	cancel3()
 	if err != nil {
-		return gofermaterrors.ErrInternal
+		return ErrInternal
 	}
 
 	return nil
@@ -70,7 +69,7 @@ func (g *Gofermart) GetWithdraws(ctx context.Context, login string) ([]storage.O
 	orders, err := g.storager.GetPointWithdraws(ctx, login)
 	cancel()
 	if err != nil {
-		return nil, gofermaterrors.ErrNoOrdersForPoints
+		return nil, ErrNoOrdersForPoints
 	}
 	return orders, nil
 }

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
+	"github.com/Schalure/gofermart/internal/gofermart"
 )
 
 // Get loyality points balance. GET /api/user/balance
@@ -71,15 +71,15 @@ func (h *Handler) WithdrawLoyaltyPoints(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if err := h.loyaltySystemManager.Withdraw(r.Context(), login, order.OrderNumber, order.Sum); err != nil {
-		if errors.Is(err, gofermaterrors.ErrInvalidOrderNumber) {
-			http.Error(w, gofermaterrors.ErrInvalidOrderNumber.Error(), http.StatusUnprocessableEntity)
+		if errors.Is(err, gofermart.ErrInvalidOrderNumber) {
+			http.Error(w, gofermart.ErrInvalidOrderNumber.Error(), http.StatusUnprocessableEntity)
 			return
 		}
-		if errors.Is(err, gofermaterrors.ErrInsufficientFunds) {
-			http.Error(w, gofermaterrors.ErrInsufficientFunds.Error(), http.StatusPaymentRequired)
+		if errors.Is(err, gofermart.ErrInsufficientFunds) {
+			http.Error(w, gofermart.ErrInsufficientFunds.Error(), http.StatusPaymentRequired)
 			return
 		}
-		http.Error(w, gofermaterrors.ErrInternal.Error(), http.StatusInternalServerError)
+		http.Error(w, gofermart.ErrInternal.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -103,11 +103,11 @@ func (h *Handler) GetOrdersWithdrawals(w http.ResponseWriter, r *http.Request) {
 
 	orders, err := h.loyaltySystemManager.GetWithdraws(r.Context(), login)
 	if err != nil {
-		if errors.Is(err, gofermaterrors.ErrNoData) {
+		if errors.Is(err, gofermart.ErrNoData) {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
-		http.Error(w, gofermaterrors.ErrInternal.Error(), http.StatusInternalServerError)
+		http.Error(w, gofermart.ErrInternal.Error(), http.StatusInternalServerError)
 		return
 	}
 

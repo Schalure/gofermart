@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Schalure/gofermart/internal/gofermart/gofermaterrors"
 	"github.com/Schalure/gofermart/internal/storage"
 	"github.com/jackc/pgx/pgtype"
 )
@@ -29,7 +28,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 			"message", "order number is not valid",
 			"orderNumber", orderNumber,
 		)
-		return gofermaterrors.ErrInvalidOrderNumber
+		return ErrInvalidOrderNumber
 	}
 
 	ctx1, cancel1 := context.WithTimeout(ctx, time.Second*5)
@@ -43,12 +42,12 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 			"error", err,
 		)
 		if order.UserLogin == login {
-			return gofermaterrors.ErrDublicateOrderNumberByUser
+			return ErrDublicateOrderNumberByUser
 		}
 		if order.UserLogin != login {
-			return gofermaterrors.ErrDublicateOrderNumber
+			return ErrDublicateOrderNumber
 		}
-		return gofermaterrors.ErrInternal
+		return ErrInternal
 	}
 
 	order = storage.Order{
@@ -69,7 +68,7 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 			"user", login,
 			"error", err,
 		)
-		return gofermaterrors.ErrInternal
+		return ErrInternal
 	}
 
 	g.wg.Add(1)
