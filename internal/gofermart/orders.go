@@ -2,6 +2,7 @@ package gofermart
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -31,35 +32,16 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 		return ErrInvalidOrderNumber
 	}
 
-	ctx1, cancel1 := context.WithTimeout(ctx, time.Second*5)
-	defer cancel1()
-	order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)
-	if err == nil {
-		g.loggerer.Infow(
-			pc,
-			"message", "can't get order by number",
-			"orderNumber", orderNumber,
-			"error", err,
-		)
-		if order.UserLogin == login {
-			return ErrDublicateOrderNumberByUser
-		}
-		if order.UserLogin != login {
-			return ErrDublicateOrderNumber
-		}
-		return ErrInternal
-	}
-
-	order = storage.Order{
+	order := storage.Order{
 		OrderNumber:   orderNumber,
 		UserLogin:     login,
 		OrderStatus:   storage.OrderStatusNew,
 		UploadedOrder: pgtype.Timestamptz{Time: time.Now()},
 	}
 
-	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)
-	defer cancel2()
-	err = g.storager.AddNewOrder(ctx2, order)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+	err := g.storager.AddNewOrder(ctx, order)
 	if err != nil {
 		g.loggerer.Infow(
 			pc,
@@ -68,6 +50,22 @@ func (g *Gofermart) LoadOrder(ctx context.Context, login, orderNumber string) er
 			"user", login,
 			"error", err,
 		)
+
+		if errors.Is(err, storage.ErrOrderNumberAlreadyExists) {
+			if order, err = g.storager.GetOrderByNumber(ctx, orderNumber); err != nil {
+				g.loggerer.Infow(
+					pc,
+					"message", "can't get order by number",
+					"orderNumber", orderNumber,
+					"error", err,
+				)
+				return ErrInternal
+			}
+			if order.UserLogin == login {
+				return ErrDublicateOrderNumberByUser
+			}
+			return ErrDublicateOrderNumber
+		}
 		return ErrInternal
 	}
 
