@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Schalure/gofermart/internal/storage"
-	"github.com/Schalure/gofermart/internal/storage/postgrestor"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -45,7 +44,7 @@ func (g *Gofermart) CreateUser(ctx context.Context, login, password string) (str
 			pc,
 			"error", err,
 		)
-		if errors.Is(err, postgrestor.ErrLoginAlreadyExists) {
+		if errors.Is(err, storage.ErrLoginAlreadyExists) {
 			return "", ErrLoginAlreadyTaken
 		}
 		return "", ErrInternal

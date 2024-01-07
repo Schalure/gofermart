@@ -2,6 +2,7 @@ package gofermart
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Schalure/gofermart/internal/storage"
@@ -20,46 +21,26 @@ func (g *Gofermart) Withdraw(ctx context.Context, login, orderNumber string, sum
 		return ErrInvalidOrderNumber
 	}
 
-	ctx1, cancel1 := context.WithTimeout(ctx, time.Second*5)
-	defer cancel1()
-	order, err := g.storager.GetOrderByNumber(ctx1, orderNumber)
-	if err == nil {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*1000)
+	err := g.storager.WithdrawPointsForOrder(ctx, login, orderNumber, sum, time.Now())
+	cancel()
+	if err != nil {
 		g.loggerer.Infow(
-			pc,
-			"message", "can't get order by number",
+			"can't withdraw points for order",
+			"loggin", login,
 			"orderNumber", orderNumber,
+			"sum", sum,
 			"error", err,
 		)
-		if order.UserLogin == login {
-			return ErrDublicateOrderNumberByUser
+
+		if errors.Is(err, storage.ErrInsufficientFunds) {
+			return ErrInsufficientFunds
 		}
-		if order.UserLogin != login {
+		if errors.Is(err, storage.ErrOrderNumberAlreadyExists) {
 			return ErrDublicateOrderNumber
 		}
 		return ErrInternal
 	}
-
-	ctx2, cancel2 := context.WithTimeout(ctx, time.Second*5)
-	user, err := g.storager.GetUserByLogin(ctx2, login)
-	cancel2()
-	if err != nil {
-		return ErrInternal
-	}
-
-	if user.LoyaltyPoints < sum {
-		return ErrInsufficientFunds
-	}
-
-	user.LoyaltyPoints -= sum
-	user.WithdrawnPoints += sum
-
-	ctx3, cancel3 := context.WithTimeout(ctx, time.Second*5)
-	err = g.storager.WithdrawPointsForOrder(ctx3, login, orderNumber, sum, time.Now())
-	cancel3()
-	if err != nil {
-		return ErrInternal
-	}
-
 	return nil
 }
 

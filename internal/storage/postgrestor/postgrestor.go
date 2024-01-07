@@ -30,7 +30,7 @@ func NewStorage(dbConnectionString string) (*Storage, error) {
 		CREATE TABLE IF NOT EXISTS users(
 		login VARCHAR(64) PRIMARY KEY,
 		password VARCHAR(64) NOT NULL,
-		loyalty_points DECIMAL DEFAULT(0),
+		loyalty_points DECIMAL DEFAULT(0) CHECK(loyalty_points >= 0),
 		withdrawn_points DECIMAL DEFAULT(0));
 	`)
 	if err != nil {
@@ -64,7 +64,7 @@ func (s *Storage) AddNewUser(ctx context.Context, user storage.User) error {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.UniqueViolation {
-				return ErrLoginAlreadyExists
+				return storage.ErrLoginAlreadyExists
 			}
 		}
 		return err
@@ -87,6 +87,12 @@ func (s *Storage) AddNewOrder(ctx context.Context, order storage.Order) error {
 		order.OrderNumber, order.UploadedOrder.Time.Format(time.RFC3339), order.UserLogin,
 	)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.UniqueViolation {
+				return storage.ErrOrderNumberAlreadyExists
+			}
+		}
 		return err
 	}
 	return nil
@@ -182,19 +188,32 @@ func (s *Storage) WithdrawPointsForOrder(ctx context.Context, login string, orde
 	}
 	defer tx.Rollback(ctx)
 
-	if _, err = tx.Exec(ctx,
-		`UPDATE users SET loyalty_points = loyalty_points - $1, withdrawn_points = withdrawn_points + $2
-		WHERE login = $3;`,
+	_, err = tx.Exec(ctx,
+		`UPDATE users SET loyalty_points = loyalty_points - $1, withdrawn_points = withdrawn_points + $2 WHERE login = $3;`,
 		sum, sum, login,
-	); err != nil {
+	); 
+
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.CheckViolation {
+				return storage.ErrInsufficientFunds
+			}
+		}
 		return err
 	}
 
-	if _, err = tx.Exec(ctx,
+	_, err = tx.Exec(ctx,
 		`INSERT INTO orders (order_number, order_status, uploaded_order, uploaded_bonus, bonus_withdraw, login) VALUES($1, $2, $3, $4, $5, $6);`,
-		orderNumber, storage.OrderStatusProcessed, time.Now().Format(time.RFC3339),
-		time.Now().Format(time.RFC3339), sum, login,
-	); err != nil {
+		orderNumber, storage.OrderStatusProcessed, time.Now().Format(time.RFC3339), time.Now().Format(time.RFC3339), sum, login,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == pgerrcode.UniqueViolation {
+				return storage.ErrOrderNumberAlreadyExists
+			}
+		}
 		return err
 	}
 	return tx.Commit(ctx)
