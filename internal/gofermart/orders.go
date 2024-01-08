@@ -95,10 +95,11 @@ func (g *Gofermart) GetOrders(ctx context.Context, login string) ([]storage.Orde
 	return orders, nil
 }
 
-func (g *Gofermart) orderCheckWorker(ctx context.Context) {
+func (g *Gofermart) orderCheckWorker(ctx context.Context, stopWG *sync.WaitGroup) {
 
 	var wgWait sync.WaitGroup
 	defer wgWait.Wait()
+	defer stopWG.Done()
 
 	//	1.	get orders to check from database
 	ctxGetOrders, cancelGetOrders := context.WithTimeout(ctx, time.Second*5)

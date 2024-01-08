@@ -1,16 +1,20 @@
 package server
 
 import (
+	"context"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type Server struct {
-	Router *chi.Mux
+	//Router *chi.Mux
+	Router http.Handler
+	server *http.Server
 }
 
-func NewServer(handler *Handler, midleware *Middleware) *Server {
+func NewServer(host string, handler *Handler, midleware *Middleware) *Server {
 
 	r := chi.NewRouter()
 
@@ -29,14 +33,15 @@ func NewServer(handler *Handler, midleware *Middleware) *Server {
 
 	return &Server{
 		Router: r,
+		server: &http.Server{Addr: host, Handler: r},
 	}
 }
 
-func (s *Server) Run(host string) error {
-
-	return http.ListenAndServe(host, s.Router)
+func (s *Server) Run() error {
+	return s.server.ListenAndServe()
 }
 
-func (s *Server) Stop(err error) {
-
+func (s *Server) Stop(ctx context.Context) error {
+	log.Println("server shutdown...")
+	return s.server.Shutdown(ctx)
 }

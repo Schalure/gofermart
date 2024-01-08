@@ -31,7 +31,7 @@ func Test_LoadOrder(t *testing.T) {
 	loyaltySystemManager := mocks.NewMockLoyaltySystemManager(mockController)
 	logger := loggers.NewLogger("debug")
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
-	server := NewServer(NewHandler(userManager, orderManager, loyaltySystemManager), NewMidleware(logger, tokenCheker))
+	server := NewServer("", NewHandler(userManager, orderManager, loyaltySystemManager), NewMidleware(logger, tokenCheker))
 
 	testServer := httptest.NewServer(server.Router)
 	defer testServer.Close()
@@ -129,7 +129,7 @@ func Test_GetOrders(t *testing.T) {
 	loyaltySystemManager := mocks.NewMockLoyaltySystemManager(mockController)
 	logger := loggers.NewLogger("debug")
 	tokenCheker := mocks.NewMockTokenCheker(mockController)
-	server := NewServer(NewHandler(userManager, orderManager, loyaltySystemManager), NewMidleware(logger, tokenCheker))
+	server := NewServer("", NewHandler(userManager, orderManager, loyaltySystemManager), NewMidleware(logger, tokenCheker))
 
 	testServer := httptest.NewServer(server.Router)
 	defer testServer.Close()

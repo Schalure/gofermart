@@ -47,24 +47,12 @@ func newEnvConfig() *EnvConfig {
 // Parse application flags
 func (c *EnvConfig) parseFlags() {
 
-	serviceHost := *flag.String("a", "", "Service host addres. Example: 127.0.0.1:8080")
-	dbHost := *flag.String("d", "", "Database host addres. Example: 127.0.0.1:8080")
-	accrualHost := *flag.String("r", "", "Accrual system address. Example: 127.0.0.1:8080")
-	appConfigFilePath := *flag.String("c", "", "Application configuration file path")
+	c.ServiceHost = *flag.String("a", defaultServiceHost, "Service host addres. Example: 127.0.0.1:8080")
+	c.DBHost = *flag.String("d", defaultDBHost, "Database host addres. Example: 127.0.0.1:8080")
+	c.AccrualHost = *flag.String("r", defaultAccrualHost, "Accrual system address. Example: 127.0.0.1:8080")
+	appConfigFilePath := *flag.String("c", defaultAppConfigFilePath, "Application configuration file path")
 
 	flag.Parse()
-
-	if isValidHostAddres(serviceHost) {
-		c.ServiceHost = serviceHost
-	}
-
-	//if isValidHostAddres(dbHost) {
-	c.DBHost = dbHost
-	//}
-
-	//if isValidHostAddres(accrualHost) {
-	c.AccrualHost = accrualHost
-	//}
 
 	if appConfigFilePath != "" {
 		c.AppConfigFilePath = appConfigFilePath

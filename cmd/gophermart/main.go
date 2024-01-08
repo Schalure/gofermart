@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/Schalure/gofermart/internal/configs"
 	"github.com/Schalure/gofermart/internal/gofermart"
@@ -47,18 +51,44 @@ func main() {
 		config.AppConfig.OrderNumberRules,
 		config.AppConfig.TokenTTL,
 	)
-	service.Run(ctx)
+	var wgStop sync.WaitGroup
+	wgStop.Add(1)
+	defer wgStop.Wait()
+	service.Run(ctx, &wgStop)
 
 	log.Println("HTTP server initializing...")
 	handler := server.NewHandler(service, service, service)
 	midleware := server.NewMidleware(logger, service)
-	server := server.NewServer(handler, midleware)
+	server := server.NewServer(config.EnvConfig.ServiceHost, handler, midleware)
+
+	go func() {
+		exit := make(chan os.Signal, 1)
+		signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
+		<-exit
+		log.Println("Application stoped by os.Interript...")
+
+		shutdownCtx, _ := context.WithTimeout(ctx, 30 * time.Second)
+
+		go func() {
+			<-shutdownCtx.Done()
+			if shutdownCtx.Err() == context.DeadlineExceeded {
+				log.Fatal("graceful shutdown timed out.. forcing exit.")
+			}
+		}()
+
+		// Trigger graceful shutdown
+		err := server.Stop(shutdownCtx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		cancel()
+		log.Println("server shutdowned...")
+	}()
 
 	log.Println(config.EnvConfig.ServiceHost, config.EnvConfig.DBHost, config.EnvConfig.AccrualHost)
-
 	log.Println("Gofermart service have been started...")
 
-	err = http.ListenAndServe(config.EnvConfig.ServiceHost, server.Router)
+	err = server.Run()
 	log.Println("Gofermart service stop:", err)
-	cancel()
+	<-ctx.Done()
 }

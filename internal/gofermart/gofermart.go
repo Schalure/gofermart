@@ -85,9 +85,9 @@ func NewGofermart(s Storager, l Loggerer, orderChecker OrderChecker, loginRules,
 }
 
 // Start service workers and other tasks
-func (g *Gofermart) Run(ctx context.Context) {
+func (g *Gofermart) Run(ctx context.Context, stopWg *sync.WaitGroup) {
 
-	go g.orderCheckWorker(ctx)
+	go g.orderCheckWorker(ctx, stopWg)
 }
 
 // Stoping service workers, other tasks and resources release
