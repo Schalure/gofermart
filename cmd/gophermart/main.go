@@ -41,7 +41,6 @@ func main() {
 	log.Println("Service initializing...")
 
 	orderChecker := loyaltysystem.NewLoyaltySystem(config.EnvConfig.AccrualHost)
-	//	orderChecker := loyaltysystem.NewMockLoyaltySystem()
 	service := gofermart.NewGofermart(
 		storage,
 		logger,
@@ -67,7 +66,7 @@ func main() {
 		<-exit
 		log.Println("Application stoped by os.Interript...")
 
-		shutdownCtx, _ := context.WithTimeout(ctx, 30 * time.Second)
+		shutdownCtx, shutdownCancel := context.WithTimeout(ctx, 30*time.Second)
 
 		go func() {
 			<-shutdownCtx.Done()
@@ -76,11 +75,11 @@ func main() {
 			}
 		}()
 
-		// Trigger graceful shutdown
 		err := server.Stop(shutdownCtx)
 		if err != nil {
 			log.Fatal(err)
 		}
+		shutdownCancel()
 		cancel()
 		log.Println("server shutdowned...")
 	}()

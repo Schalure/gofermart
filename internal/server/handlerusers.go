@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 	"time"
 
@@ -21,7 +20,15 @@ type authenticationData struct {
 // User registration handler. POST /api/user/register
 func (h *Handler) UserRegistration(response http.ResponseWriter, request *http.Request) {
 
-	authData, err := getAuthenticationData(request.Body)
+	var buf bytes.Buffer
+	var authData authenticationData
+
+	if _, err := buf.ReadFrom(request.Body); err != nil {
+		http.Error(response, "error reading user login and password", http.StatusBadRequest)
+		return
+	}
+
+	err := json.Unmarshal(buf.Bytes(), &authData)
 	if err != nil {
 		http.Error(response, "error reading user login and password", http.StatusBadRequest)
 		return
@@ -49,7 +56,15 @@ func (h *Handler) UserRegistration(response http.ResponseWriter, request *http.R
 // User authentication handler. POST /api/user/login
 func (h *Handler) UserAuthentication(response http.ResponseWriter, request *http.Request) {
 
-	authData, err := getAuthenticationData(request.Body)
+	var buf bytes.Buffer
+	var authData authenticationData
+
+	if _, err := buf.ReadFrom(request.Body); err != nil {
+		http.Error(response, "error reading user login and password", http.StatusBadRequest)
+		return
+	}
+
+	err := json.Unmarshal(buf.Bytes(), &authData)
 	if err != nil {
 		http.Error(response, "error reading user login and password", http.StatusBadRequest)
 		return
@@ -71,20 +86,4 @@ func (h *Handler) UserAuthentication(response http.ResponseWriter, request *http
 		Value: token,
 	})
 	response.WriteHeader(http.StatusOK)
-}
-
-// Get authentication data
-func getAuthenticationData(r io.Reader) (authenticationData, error) {
-
-	var buf bytes.Buffer
-	var data authenticationData
-
-	// читаем тело запроса
-	if _, err := buf.ReadFrom(r); err != nil {
-		return data, err
-	}
-
-	err := json.Unmarshal(buf.Bytes(), &data)
-
-	return data, err
 }

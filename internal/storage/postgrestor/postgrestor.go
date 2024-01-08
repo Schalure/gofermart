@@ -191,7 +191,7 @@ func (s *Storage) WithdrawPointsForOrder(ctx context.Context, login string, orde
 	_, err = tx.Exec(ctx,
 		`UPDATE users SET loyalty_points = loyalty_points - $1, withdrawn_points = withdrawn_points + $2 WHERE login = $3;`,
 		sum, sum, login,
-	); 
+	)
 
 	if err != nil {
 		var pgErr *pgconn.PgError

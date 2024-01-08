@@ -89,9 +89,3 @@ func (g *Gofermart) Run(ctx context.Context, stopWg *sync.WaitGroup) {
 
 	go g.orderCheckWorker(ctx, stopWg)
 }
-
-// Stoping service workers, other tasks and resources release
-func (g *Gofermart) Stop(ctx context.Context) {
-
-	//close(g.inputCh)
-}

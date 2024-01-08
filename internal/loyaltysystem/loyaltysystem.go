@@ -45,11 +45,11 @@ func (s *LoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) (sto
 		Status  OrderStatus `json:"status"`
 		Accrual float64     `json:"accrual"`
 	}
-	var res result
+	var rslt result
 
 	resp, err := s.client.R().
 		SetContext(ctx).
-		SetResult(&res).
+		SetResult(&rslt).
 		SetPathParams(map[string]string{"number": ordernumber}).
 		Get(s.queryString)
 
@@ -59,7 +59,7 @@ func (s *LoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) (sto
 
 	var orderStatus storage.OrderStatus
 
-	switch res.Status {
+	switch rslt.Status {
 	case Registered:
 		orderStatus = storage.OrderStatusNew
 	case Invalid:
@@ -71,8 +71,8 @@ func (s *LoyaltySystem) OrderCheck(ctx context.Context, ordernumber string) (sto
 	}
 
 	return storage.Order{
-		OrderNumber: res.Order,
+		OrderNumber: rslt.Order,
 		OrderStatus: orderStatus,
-		BonusPoints: res.Accrual,
+		BonusPoints: rslt.Accrual,
 	}, resp.StatusCode()
 }
